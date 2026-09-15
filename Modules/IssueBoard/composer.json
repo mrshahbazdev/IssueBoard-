@@ -1,0 +1,22 @@
+{
+    "name": "issueboard/domain",
+    "description": "Issue tracking and team coordination domain module.",
+    "type": "laravel-module",
+    "require": {
+        "php": "^8.2",
+        "livewire/livewire": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\IssueBoard\\": "app/",
+            "Modules\\IssueBoard\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\IssueBoard\\Providers\\IssueBoardServiceProvider"
+            ]
+        }
+    }
+}

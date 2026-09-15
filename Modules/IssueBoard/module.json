@@ -1,0 +1,11 @@
+{
+    "name": "IssueBoard",
+    "alias": "issueboard",
+    "description": "Aufgabenboard fuer die interne Abstimmung: Status-Farben, Bilder, Links, Rueckfragen.",
+    "keywords": ["issues", "kanban", "kommunikation"],
+    "priority": 0,
+    "providers": [
+        "Modules\\IssueBoard\\Providers\\IssueBoardServiceProvider"
+    ],
+    "files": []
+}

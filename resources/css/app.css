@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../Modules/IssueBoard/resources/views/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    body {
+        background:
+            radial-gradient(circle at 0% 0%, rgb(245 158 11 / 0.06), transparent 28rem),
+            #f8fafc;
+    }
+
+    ::selection {
+        background: rgb(251 146 60 / 0.25);
+    }
+}

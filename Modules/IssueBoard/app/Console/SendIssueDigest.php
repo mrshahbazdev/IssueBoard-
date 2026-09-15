@@ -2,6 +2,9 @@
 
 namespace Modules\IssueBoard\Console;
 
+use App\Enums\UserRole;
+use App\Models\User;
+use App\Support\UserSmtpMailer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +19,7 @@ class SendIssueDigest extends Command
 
     protected $description = 'Sends the weekly summary of open tasks to responsible team roles';
 
-    public function handle(): int
+    public function handle(UserSmtpMailer $smtpMailer): int
     {
         if (! config('issueboard.digest.enabled')) {
             $this->info('The digest is disabled.');
@@ -24,30 +27,55 @@ class SendIssueDigest extends Command
             return self::SUCCESS;
         }
 
-        $base = Issue::with('project', 'assignee', 'author');
+        $sender = User::query()
+            ->whereIn('role', [UserRole::Admin->value, UserRole::Manager->value])
+            ->whereHas('mailSetting')
+            ->first();
 
-        $newIssues = (clone $base)->where('status', IssueStatus::New->value)->latest()->get();
-        $inReview = (clone $base)->where('status', IssueStatus::Review->value)->latest()->get();
-        $overdue = (clone $base)->open()->whereDate('due_date', '<', now())->get();
+        if (! $sender && ! $this->option('dry-run')) {
+            $this->error('No Admin or Manager has configured SMTP settings.');
 
-        $openQuestions = IssueComment::with('issue', 'user')
-            ->where('is_question', true)
-            ->whereNull('answered_at')
-            ->latest()
-            ->get();
-
-        if ($newIssues->isEmpty() && $inReview->isEmpty() && $openQuestions->isEmpty() && $overdue->isEmpty()) {
-            $this->info('Nothing is open; no email was sent.');
-
-            return self::SUCCESS;
+            return self::FAILURE;
         }
 
+        $sent = false;
         foreach ($this->recipients() as $user) {
+            $base = Issue::query()
+                ->visibleTo($user)
+                ->with('project', 'assignee', 'author');
+
+            $newIssues = (clone $base)->where('status', IssueStatus::New->value)->latest()->get();
+            $inReview = (clone $base)->where('status', IssueStatus::Review->value)->latest()->get();
+            $overdue = (clone $base)->open()->whereDate('due_date', '<', now())->get();
+            $openQuestions = IssueComment::with('issue', 'user')
+                ->whereHas('issue', fn ($query) => $query->visibleTo($user))
+                ->where('is_question', true)
+                ->whereNull('answered_at')
+                ->latest()
+                ->get();
+
+            if ($newIssues->isEmpty() && $inReview->isEmpty() && $openQuestions->isEmpty() && $overdue->isEmpty()) {
+                continue;
+            }
+
             $this->line("-> {$user->email}");
+            $sent = true;
 
             if (! $this->option('dry-run')) {
-                Mail::to($user)->send(new IssueDigest($newIssues, $inReview, $openQuestions, $overdue, $user->name));
+                $message = (new IssueDigest($newIssues, $inReview, $openQuestions, $overdue, $user->name))
+                    ->from(
+                        $sender->mailSetting->from_address,
+                        $sender->mailSetting->from_name ?: $sender->name
+                    );
+
+                Mail::mailer($smtpMailer->mailerFor($sender))
+                    ->to($user)
+                    ->send($message);
             }
+        }
+
+        if (! $sent) {
+            $this->info('Nothing is open; no email was sent.');
         }
 
         return self::SUCCESS;

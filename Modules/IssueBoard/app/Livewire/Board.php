@@ -39,9 +39,14 @@ class Board extends Component
         $issue->moveTo($target, auth()->user());
 
         if ($orderedIds) {
-            DB::transaction(function () use ($orderedIds) {
+            $user = auth()->user();
+
+            DB::transaction(function () use ($orderedIds, $user) {
                 foreach ($orderedIds as $position => $id) {
-                    Issue::whereKey($id)->update(['position' => $position]);
+                    Issue::query()
+                        ->visibleTo($user)
+                        ->whereKey($id)
+                        ->update(['position' => $position]);
                 }
             });
         }
@@ -66,6 +71,7 @@ class Board extends Component
     public function render()
     {
         $issues = Issue::query()
+            ->visibleTo(auth()->user())
             ->forProject($this->projectId ? (int) $this->projectId : null)
             ->search($this->search)
             ->when($this->onlyMine, fn ($q) => $q->where('assigned_to', auth()->id()))

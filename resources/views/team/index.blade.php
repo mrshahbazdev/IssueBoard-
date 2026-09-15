@@ -9,6 +9,97 @@
             <span class="self-start rounded-full bg-slate-950 px-3 py-1.5 text-xs font-extrabold text-white">{{ trans_choice('app.team.people', $users->count(), ['count' => $users->count()]) }}</span>
         </div>
 
+        <section class="relative mt-7 overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/10 sm:p-8">
+            <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl"></div>
+            <div class="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-orange-400/10 blur-3xl"></div>
+
+            <div class="relative grid gap-7 lg:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] lg:items-end">
+                <div>
+                    <span class="inline-flex rounded-full border border-orange-300/25 bg-orange-300/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-orange-200">{{ __('app.team.invite_eyebrow') }}</span>
+                    <h2 class="mt-4 text-2xl font-extrabold tracking-tight">{{ __('app.team.invite_heading') }}</h2>
+                    <p class="mt-2 max-w-md text-sm leading-6 text-slate-300">{{ __('app.team.invite_description') }}</p>
+                    @if (auth()->user()->mailSetting()->exists())
+                        <p class="mt-3 inline-flex items-center gap-2 text-xs font-bold text-cyan-300">
+                            <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
+                            {{ __('app.team.smtp_connected') }}
+                        </p>
+                    @else
+                        <a href="{{ route('profile.edit') }}#smtp" class="mt-3 inline-flex items-center gap-2 text-xs font-bold text-orange-300 underline decoration-orange-300/40 underline-offset-4 hover:text-orange-200">
+                            {{ __('app.team.smtp_setup') }}
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    @endif
+                </div>
+
+                <form method="POST" action="{{ route('team.invitations.store') }}" class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto] sm:items-end">
+                    @csrf
+                    <div>
+                        <label for="invite_email" class="text-xs font-bold text-slate-300">{{ __('app.team.invite_email') }}</label>
+                        <input id="invite_email" name="email" type="email" value="{{ old('email') }}" required autocomplete="email"
+                               placeholder="{{ __('app.team.invite_email_placeholder') }}"
+                               class="mt-2 w-full rounded-xl border-white/15 bg-white/10 px-4 py-3 text-sm text-white shadow-sm placeholder:text-slate-500 focus:border-orange-400 focus:ring-orange-400">
+                    </div>
+                    <div>
+                        <label for="invite_role" class="text-xs font-bold text-slate-300">{{ __('app.team.invite_role') }}</label>
+                        <select id="invite_role" name="role" required class="mt-2 w-full rounded-xl border-white/15 bg-slate-900 px-3 py-3 text-sm font-semibold text-white focus:border-orange-400 focus:ring-orange-400">
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->value }}" @selected(old('role', \App\Enums\UserRole::Member->value) === $role->value)>{{ $role->label() }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button class="rounded-xl bg-orange-500 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-orange-950/20 transition hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300">
+                        {{ __('app.team.send_invite') }}
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        @if ($errors->any())
+            <div class="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{{ $errors->first() }}</div>
+        @endif
+
+        @if ($invitations->isNotEmpty())
+            <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-950">{{ __('app.team.pending_heading') }}</h2>
+                        <p class="mt-1 text-sm text-slate-500">{{ __('app.team.pending_description') }}</p>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{{ trans_choice('app.team.pending_count', $invitations->count(), ['count' => $invitations->count()]) }}</span>
+                </div>
+
+                <div class="mt-5 grid gap-3 md:grid-cols-2">
+                    @foreach ($invitations as $invitation)
+                        <article class="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <span class="absolute inset-y-0 left-0 w-1 {{ $invitation->expires_at->isPast() ? 'bg-rose-500' : 'bg-cyan-500' }}"></span>
+                            <div class="flex items-start justify-between gap-3 pl-2">
+                                <div class="min-w-0">
+                                    <p class="truncate text-sm font-extrabold text-slate-900">{{ $invitation->email }}</p>
+                                    <div class="mt-2 flex flex-wrap items-center gap-2">
+                                        <span class="inline-flex rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ring-1 ring-inset {{ $invitation->role->badgeClasses() }}">{{ $invitation->role->label() }}</span>
+                                        <span class="text-xs font-semibold {{ $invitation->expires_at->isPast() ? 'text-rose-600' : 'text-slate-500' }}">
+                                            {{ $invitation->expires_at->isPast() ? __('app.team.invite_expired') : __('app.team.invite_expires', ['date' => $invitation->expires_at->translatedFormat('j M Y')]) }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex shrink-0 items-center gap-1.5">
+                                    <form method="POST" action="{{ route('team.invitations.resend', $invitation) }}">
+                                        @csrf
+                                        <button class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">{{ __('app.team.resend') }}</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('team.invitations.destroy', $invitation) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="rounded-lg px-3 py-2 text-xs font-extrabold text-rose-600 transition hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">{{ __('app.team.cancel') }}</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
         <div class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             @foreach ($roles as $role)
                 <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -17,10 +108,6 @@
                 </div>
             @endforeach
         </div>
-
-        @if ($errors->any())
-            <div class="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{{ $errors->first() }}</div>
-        @endif
 
         <section class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="overflow-x-auto">

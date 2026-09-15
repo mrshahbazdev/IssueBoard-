@@ -16,7 +16,7 @@ class IssuePolicy
 
     public function view(Model $user, Issue $issue): bool
     {
-        return true;
+        return $issue->isVisibleTo($user);
     }
 
     public function create(Model $user): bool
@@ -26,12 +26,12 @@ class IssuePolicy
 
     public function update(Model $user, Issue $issue): bool
     {
-        return in_array(static::roleOf($user), [
+        return $this->view($user, $issue) && (in_array(static::roleOf($user), [
             UserRole::Admin->value,
             UserRole::Manager->value,
             UserRole::Developer->value,
         ], true)
-            || $issue->created_by === $user->getKey();
+            || $issue->created_by === $user->getKey());
     }
 
     public function delete(Model $user, Issue $issue): bool
@@ -41,14 +41,16 @@ class IssuePolicy
 
     public function comment(Model $user, Issue $issue): bool
     {
-        return static::roleOf($user) !== UserRole::Viewer->value;
+        return $this->view($user, $issue)
+            && static::roleOf($user) !== UserRole::Viewer->value;
     }
 
     public function moveTo(Model $user, Issue $issue, IssueStatus $status): bool
     {
         $allowed = config('issueboard.transitions')[static::roleOf($user)] ?? [];
 
-        return in_array('*', $allowed, true) || in_array($status->value, $allowed, true);
+        return $this->view($user, $issue)
+            && (in_array('*', $allowed, true) || in_array($status->value, $allowed, true));
     }
 
     public static function roleOf(Model $user): string

@@ -2,6 +2,7 @@
 
 namespace Modules\IssueBoard\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -116,6 +117,17 @@ class Issue extends Model
         ]);
     }
 
+    public function scopeVisibleTo(Builder $query, Model $user): Builder
+    {
+        $role = $user->role instanceof UserRole ? $user->role : UserRole::tryFrom($user->role);
+
+        if (in_array($role, [UserRole::Admin, UserRole::Manager], true)) {
+            return $query;
+        }
+
+        return $query->where('assigned_to', $user->getKey());
+    }
+
     // ----------------------------------------------------------------- actions
 
     public function moveTo(IssueStatus $to, Model $user, bool $notify = true): void
@@ -149,7 +161,6 @@ class Issue extends Model
         }
     }
 
-    /** Everyone who should hear about this issue: author, assignee, commenters. */
     public function watchers(): Collection
     {
         $userModel = config('issueboard.user_model');
@@ -159,12 +170,24 @@ class Issue extends Model
             ->filter()
             ->unique();
 
-        return $ids->isEmpty()
+        $watchers = $ids->isEmpty()
             ? collect()
             : $userModel::whereIn((new $userModel)->getKeyName(), $ids)->get();
+
+        return $watchers
+            ->filter(fn (Model $user) => $this->isVisibleTo($user))
+            ->values();
     }
 
     // -------------------------------------------------------------- accessors
+
+    public function isVisibleTo(Model $user): bool
+    {
+        $role = $user->role instanceof UserRole ? $user->role : UserRole::tryFrom($user->role);
+
+        return in_array($role, [UserRole::Admin, UserRole::Manager], true)
+            || $this->assigned_to === $user->getKey();
+    }
 
     public function getPriorityLabelAttribute(): string
     {

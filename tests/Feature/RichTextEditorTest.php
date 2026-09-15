@@ -50,6 +50,7 @@ class RichTextEditorTest extends TestCase
         $issue = Issue::create([
             'title' => 'Comment formatting',
             'created_by' => $user->id,
+            'assigned_to' => $user->id,
             'status' => IssueStatus::New,
         ]);
 

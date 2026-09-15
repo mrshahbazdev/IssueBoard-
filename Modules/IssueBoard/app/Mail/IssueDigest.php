@@ -3,13 +3,12 @@
 namespace Modules\IssueBoard\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Collection;
 
-class IssueDigest extends Mailable implements ShouldQueue
+class IssueDigest extends Mailable
 {
     use Queueable;
 

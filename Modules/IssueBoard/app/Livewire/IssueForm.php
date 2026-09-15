@@ -139,9 +139,11 @@ class IssueForm extends Component
         if ($isNew) {
             $this->authorize('create', Issue::class);
 
-            $this->issue = Issue::create($data + [
+            $this->issue = Issue::create([
+                ...$data,
                 'status' => IssueStatus::New,
                 'created_by' => auth()->id(),
+                'assigned_to' => $data['assigned_to'] ?: auth()->id(),
             ]);
         } else {
             $this->authorize('update', $this->issue);
@@ -174,6 +176,10 @@ class IssueForm extends Component
         }
 
         session()->flash('status', __('issueboard::issueboard.saved'));
+
+        if (! $this->issue->isVisibleTo(auth()->user())) {
+            return redirect()->route('issueboard.index');
+        }
 
         return redirect()->route('issueboard.show', $this->issue);
     }

@@ -36,8 +36,12 @@
         </button>
     </form>
 
-    <p class="mt-7 text-center text-sm text-slate-500">
-        {{ __('app.login.new_user') }}
-        <a href="{{ route('register') }}" class="font-bold text-orange-600 hover:text-orange-700">{{ __('app.login.create_account') }}</a>
-    </p>
+    @if ($registrationOpen)
+        <p class="mt-7 text-center text-sm text-slate-500">
+            {{ __('app.login.new_user') }}
+            <a href="{{ route('register') }}" class="font-bold text-orange-600 hover:text-orange-700">{{ __('app.login.create_account') }}</a>
+        </p>
+    @else
+        <p class="mt-7 text-center text-sm leading-6 text-slate-500">{{ __('app.login.invitation_only') }}</p>
+    @endif
 </x-layouts.auth>

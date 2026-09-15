@@ -15,6 +15,7 @@ A standalone internal communication board for project changes, small issues, que
 - English and German interface with a persistent language switch
 - Status history and weekly digest command
 - Custom authentication, profile, and password screens
+- First-account owner setup followed by invitation-only registration
 - Role-based access with Admin, Manager, Developer, Team member, and Viewer roles
 - Admin team invitations, pending invites, resend/cancel actions, and role management
 - Personal SMTP settings managed from each profile, with encrypted passwords
@@ -43,6 +44,8 @@ PHP_CLI_SERVER_WORKERS=4 php artisan serve --host=0.0.0.0 --port=8000 --no-reloa
 ```
 
 Open `http://127.0.0.1:8000`.
+
+Without demo seed data, the first person to register becomes the workspace Admin. After that owner account exists, public registration closes and new users join through Admin invitations. Running `php artisan migrate --seed` creates the local demo accounts below, so use the seeded Admin instead of the registration page.
 
 ## Apache and shared-hosting deployment
 

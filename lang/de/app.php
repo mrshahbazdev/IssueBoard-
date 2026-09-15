@@ -34,15 +34,16 @@ return [
         'submit' => 'Anmelden',
         'new_user' => 'Neu bei IssueBoard?',
         'create_account' => 'Konto erstellen',
+        'invitation_only' => 'Dieser Arbeitsbereich ist nur per Einladung zugänglich. Bitten Sie einen Administrator um eine Einladung.',
         'too_many_attempts' => 'Zu viele Anmeldeversuche. Bitte versuchen Sie es in :seconds Sekunden erneut.',
         'invalid_credentials' => 'Die Anmeldedaten stimmen nicht mit unseren Daten überein.',
     ],
 
     'register' => [
         'title' => 'Konto erstellen',
-        'eyebrow' => 'Arbeitsbereich beitreten',
-        'heading' => 'Erstellen Sie Ihr Konto',
-        'description' => 'Neue Konten starten als Teammitglied. Administratoren können den Zugriff später anpassen.',
+        'eyebrow' => 'Arbeitsbereich erstellen',
+        'heading' => 'Inhaberkonto einrichten',
+        'description' => 'Das erste Konto wird Administrator des Arbeitsbereichs und kann alle weiteren Personen einladen.',
         'name' => 'Vollständiger Name',
         'name_placeholder' => 'Ihr Name',
         'email' => 'E-Mail-Adresse',
@@ -57,6 +58,7 @@ return [
         'submit' => 'Konto erstellen',
         'existing_user' => 'Sie haben bereits ein Konto?',
         'sign_in' => 'Anmelden',
+        'closed' => 'Der Inhaber des Arbeitsbereichs ist bereits eingerichtet. Bitten Sie einen Administrator um eine Einladung.',
     ],
 
     'profile' => [

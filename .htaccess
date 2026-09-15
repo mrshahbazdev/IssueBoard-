@@ -1,0 +1,15 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Keep internally rewritten requests inside Laravel's public directory.
+    RewriteRule ^public(?:/|$) - [L]
+
+    # Shared-hosting fallback when the domain document root cannot be changed.
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>

@@ -100,6 +100,7 @@ return [
         'smtp_test_failed' => 'Die SMTP-Verbindung ist fehlgeschlagen. Prüfen Sie Host, Port, Sicherheit und Zugangsdaten.',
         'smtp_remove' => 'SMTP-Einstellungen entfernen',
         'smtp_removed' => 'SMTP-Einstellungen entfernt.',
+        'smtp_routes_unavailable' => 'Die E-Mail-Einstellungen sind vorübergehend nicht verfügbar, da der Deployment-Cache veraltet ist. Bitten Sie einen Administrator, den Laravel-Anwendungscache zu aktualisieren.',
     ],
 
     'team' => [
@@ -141,6 +142,7 @@ return [
         'smtp_required' => 'Richten Sie Ihr SMTP-Konto im Profil ein, bevor Sie Einladungen senden.',
         'smtp_connected' => 'Ihr SMTP-Konto versendet diese Einladung',
         'smtp_setup' => 'Zuerst SMTP-Konto einrichten',
+        'invitation_routes_unavailable' => 'Teameinladungen sind vorübergehend nicht verfügbar, da der Deployment-Cache veraltet ist. Aktualisieren Sie den Laravel-Anwendungscache, um sie wiederherzustellen.',
     ],
 
     'invitation' => [

@@ -61,7 +61,14 @@ php artisan storage:link
 php artisan optimize
 ```
 
-On later deployments, keep the existing `.env` and `APP_KEY`; do not generate a new key. Run `composer install --no-dev --optimize-autoloader`, migrations, and `php artisan optimize` after updating the code.
+On later deployments, keep the existing `.env` and `APP_KEY`; do not generate a new key. Refresh Laravel's cached routes and configuration after updating the code:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan optimize:clear
+php artisan migrate --force
+php artisan optimize
+```
 
 Before serving traffic, update `.env` for production:
 

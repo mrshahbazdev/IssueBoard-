@@ -66,6 +66,8 @@
             </form>
         </div>
 
+        @php($smtpRoutesAvailable = Route::has('profile.smtp') && Route::has('profile.smtp.test') && Route::has('profile.smtp.destroy'))
+
         <section id="smtp" class="relative mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <span class="absolute inset-y-0 left-0 w-1.5 bg-cyan-500"></span>
             <div class="p-6 sm:p-7">
@@ -93,7 +95,13 @@
                     <div class="mt-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{{ $message }}</div>
                 @enderror
 
-                <form method="POST" action="{{ route('profile.smtp') }}" class="mt-6">
+                @unless ($smtpRoutesAvailable)
+                    <div class="mt-5 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">
+                        {{ __('app.profile.smtp_routes_unavailable') }}
+                    </div>
+                @endunless
+
+                <form method="POST" action="{{ $smtpRoutesAvailable ? route('profile.smtp') : '#' }}" class="mt-6">
                     @csrf
                     @method('PUT')
 
@@ -151,19 +159,19 @@
                         </div>
                     </div>
 
-                    <button class="mt-6 rounded-xl bg-cyan-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">{{ __('app.profile.smtp_save') }}</button>
+                    <button @disabled(! $smtpRoutesAvailable) class="mt-6 rounded-xl bg-cyan-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_save') }}</button>
                 </form>
 
                 @if ($user->mailSetting)
                     <div class="mt-4 flex flex-wrap gap-3 border-t border-slate-100 pt-4">
-                        <form method="POST" action="{{ route('profile.smtp.test') }}">
+                        <form method="POST" action="{{ $smtpRoutesAvailable ? route('profile.smtp.test') : '#' }}">
                             @csrf
-                            <button class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-extrabold text-slate-700 transition hover:border-cyan-400 hover:text-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">{{ __('app.profile.smtp_test') }}</button>
+                            <button @disabled(! $smtpRoutesAvailable) class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-extrabold text-slate-700 transition hover:border-cyan-400 hover:text-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_test') }}</button>
                         </form>
-                        <form method="POST" action="{{ route('profile.smtp.destroy') }}">
+                        <form method="POST" action="{{ $smtpRoutesAvailable ? route('profile.smtp.destroy') : '#' }}">
                             @csrf
                             @method('DELETE')
-                            <button class="rounded-xl px-4 py-2.5 text-xs font-extrabold text-rose-600 transition hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">{{ __('app.profile.smtp_remove') }}</button>
+                            <button @disabled(! $smtpRoutesAvailable) class="rounded-xl px-4 py-2.5 text-xs font-extrabold text-rose-600 transition hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_remove') }}</button>
                         </form>
                     </div>
                 @endif

@@ -9,6 +9,8 @@
             <span class="self-start rounded-full bg-slate-950 px-3 py-1.5 text-xs font-extrabold text-white">{{ trans_choice('app.team.people', $users->count(), ['count' => $users->count()]) }}</span>
         </div>
 
+        @php($invitationRoutesAvailable = Route::has('team.invitations.store') && Route::has('team.invitations.resend') && Route::has('team.invitations.destroy'))
+
         <section class="relative mt-7 overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/10 sm:p-8">
             <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl"></div>
             <div class="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-orange-400/10 blur-3xl"></div>
@@ -31,7 +33,7 @@
                     @endif
                 </div>
 
-                <form method="POST" action="{{ route('team.invitations.store') }}" class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto] sm:items-end">
+                <form method="POST" action="{{ $invitationRoutesAvailable ? route('team.invitations.store') : '#' }}" class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto] sm:items-end">
                     @csrf
                     <div>
                         <label for="invite_email" class="text-xs font-bold text-slate-300">{{ __('app.team.invite_email') }}</label>
@@ -47,12 +49,18 @@
                             @endforeach
                         </select>
                     </div>
-                    <button class="rounded-xl bg-orange-500 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-orange-950/20 transition hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300">
+                    <button @disabled(! $invitationRoutesAvailable) class="rounded-xl bg-orange-500 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-orange-950/20 transition hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300 disabled:cursor-not-allowed disabled:opacity-50">
                         {{ __('app.team.send_invite') }}
                     </button>
                 </form>
             </div>
         </section>
+
+        @unless ($invitationRoutesAvailable)
+            <section class="mt-6 rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4 text-sm font-semibold text-orange-800">
+                {{ __('app.team.invitation_routes_unavailable') }}
+            </section>
+        @endunless
 
         @if ($errors->any())
             <div class="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{{ $errors->first() }}</div>
@@ -83,14 +91,14 @@
                                     </div>
                                 </div>
                                 <div class="flex shrink-0 items-center gap-1.5">
-                                    <form method="POST" action="{{ route('team.invitations.resend', $invitation) }}">
+                                    <form method="POST" action="{{ $invitationRoutesAvailable ? route('team.invitations.resend', $invitation) : '#' }}">
                                         @csrf
-                                        <button class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">{{ __('app.team.resend') }}</button>
+                                        <button @disabled(! $invitationRoutesAvailable) class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.team.resend') }}</button>
                                     </form>
-                                    <form method="POST" action="{{ route('team.invitations.destroy', $invitation) }}">
+                                    <form method="POST" action="{{ $invitationRoutesAvailable ? route('team.invitations.destroy', $invitation) : '#' }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="rounded-lg px-3 py-2 text-xs font-extrabold text-rose-600 transition hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">{{ __('app.team.cancel') }}</button>
+                                        <button @disabled(! $invitationRoutesAvailable) class="rounded-lg px-3 py-2 text-xs font-extrabold text-rose-600 transition hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.team.cancel') }}</button>
                                     </form>
                                 </div>
                             </div>

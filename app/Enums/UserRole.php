@@ -12,24 +12,12 @@ enum UserRole: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Admin => 'Admin',
-            self::Manager => 'Manager',
-            self::Developer => 'Developer',
-            self::Member => 'Team member',
-            self::Viewer => 'Viewer',
-        };
+        return __('app.roles.'.$this->value.'.label');
     }
 
     public function description(): string
     {
-        return match ($this) {
-            self::Admin => 'Full access, including team roles.',
-            self::Manager => 'Manages tasks, priorities, and workflow.',
-            self::Developer => 'Works on tasks and moves implementation forward.',
-            self::Member => 'Reports tasks, joins discussions, and updates own reports.',
-            self::Viewer => 'Read-only access to the board and conversations.',
-        };
+        return __('app.roles.'.$this->value.'.description');
     }
 
     public function badgeClasses(): string

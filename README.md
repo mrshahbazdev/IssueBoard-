@@ -11,6 +11,8 @@ A standalone internal communication board for project changes, small issues, que
 - Links, screenshots, and file attachments
 - Reporter contact details
 - Comments, follow-up questions, threaded replies, and answered state
+- Rich text for descriptions, suggested solutions, comments, and replies
+- English and German interface with a persistent language switch
 - Status history and weekly digest command
 - Custom authentication, profile, and password screens
 - Role-based access with Admin, Manager, Developer, Team member, and Viewer roles
@@ -20,7 +22,6 @@ A standalone internal communication board for project changes, small issues, que
 
 - PHP 8.2+
 - Composer
-- Node.js 22+
 - SQLite for the default local setup
 
 ## Local setup
@@ -32,12 +33,17 @@ php artisan key:generate
 touch database/database.sqlite
 php artisan migrate --seed
 php artisan storage:link
-npm install
-npm run build
 PHP_CLI_SERVER_WORKERS=4 php artisan serve --host=0.0.0.0 --port=8000 --no-reload
 ```
 
 Open `http://127.0.0.1:8000`.
+
+Production frontend assets are included in Git. Node.js 22+ is only required when changing and rebuilding the frontend:
+
+```bash
+npm install
+npm run build
+```
 
 ## Local demo accounts
 

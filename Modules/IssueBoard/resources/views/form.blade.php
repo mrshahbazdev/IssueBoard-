@@ -70,9 +70,12 @@
                         <label for="description" class="block text-sm font-semibold text-slate-700">
                             {{ __('issueboard::issueboard.fields.description') }}
                         </label>
-                        <textarea id="description" wire:model="description" rows="7"
-                                  placeholder="{{ __('issueboard::issueboard.placeholders.description') }}"
-                                  class="mt-2 w-full rounded-xl border-slate-300 bg-slate-50 text-sm leading-6 focus:border-[#ff9200] focus:bg-white focus:ring-[#ff9200]"></textarea>
+                        <x-rich-text-editor
+                            id="description"
+                            wire:model="description"
+                            :placeholder="__('issueboard::issueboard.placeholders.description')"
+                            min-height="min-h-48"
+                        />
                         @error('description') <p class="mt-1.5 text-xs font-medium text-rose-600">{{ $message }}</p> @enderror
                     </div>
 
@@ -81,9 +84,12 @@
                             {{ __('issueboard::issueboard.fields.suggested_solution') }}
                             <span class="ml-1 text-xs font-normal text-slate-400">{{ __('issueboard::issueboard.optional') }}</span>
                         </label>
-                        <textarea id="solution" wire:model="suggested_solution" rows="4"
-                                  placeholder="{{ __('issueboard::issueboard.placeholders.solution') }}"
-                                  class="mt-2 w-full rounded-xl border-slate-300 bg-slate-50 text-sm leading-6 focus:border-[#ff9200] focus:bg-white focus:ring-[#ff9200]"></textarea>
+                        <x-rich-text-editor
+                            id="solution"
+                            wire:model="suggested_solution"
+                            :placeholder="__('issueboard::issueboard.placeholders.solution')"
+                            min-height="min-h-32"
+                        />
                     </div>
                 </div>
             </section>

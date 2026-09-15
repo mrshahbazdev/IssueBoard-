@@ -69,6 +69,7 @@ return [
     'upload_hint' => 'Bilder, PDF und Office-Dateien bis :size MB.',
     'contact_help' => 'Wen soll das Team bei Unklarheiten kontaktieren?',
     'confirm_delete_comment' => 'Diesen Kommentar löschen?',
+    'viewer_read_only' => 'Ihre Betrachterrolle hat nur Lesezugriff auf diese Unterhaltung.',
 
     'sections' => [
         'issue' => 'Was muss beachtet werden?',

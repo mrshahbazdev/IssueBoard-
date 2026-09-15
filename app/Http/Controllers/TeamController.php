@@ -25,7 +25,7 @@ class TeamController extends Controller
         abort_unless($request->user()->canManageTeam(), 403);
 
         if ($request->user()->is($user)) {
-            return back()->withErrors(['role' => 'You cannot change your own role.']);
+            return back()->withErrors(['role' => __('app.team.cannot_change_own_role')]);
         }
 
         $data = $request->validate([
@@ -34,6 +34,6 @@ class TeamController extends Controller
 
         $user->update(['role' => $data['role']]);
 
-        return back()->with('status', "{$user->name}'s role was updated.");
+        return back()->with('status', __('app.team.role_updated', ['name' => $user->name]));
     }
 }

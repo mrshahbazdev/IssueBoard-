@@ -69,6 +69,7 @@ return [
     'upload_hint' => 'Images, PDF and Office files up to :size MB.',
     'contact_help' => 'Who should the team contact if anything is unclear?',
     'confirm_delete_comment' => 'Delete this comment?',
+    'viewer_read_only' => 'Your viewer role has read-only access to this conversation.',
 
     'sections' => [
         'issue' => 'What needs attention?',

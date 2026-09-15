@@ -11,6 +11,7 @@ use Livewire\WithFileUploads;
 use Modules\IssueBoard\Enums\IssueStatus;
 use Modules\IssueBoard\Models\Issue;
 use Modules\IssueBoard\Notifications\IssueCreated;
+use Modules\IssueBoard\Support\RichText;
 
 class IssueForm extends Component
 {
@@ -124,8 +125,8 @@ class IssueForm extends Component
 
         $data = [
             'title' => $this->title,
-            'description' => $this->description ?: null,
-            'suggested_solution' => $this->suggested_solution ?: null,
+            'description' => RichText::clean($this->description),
+            'suggested_solution' => RichText::clean($this->suggested_solution),
             'project_id' => $this->project_id ?: null,
             'assigned_to' => $this->assigned_to ?: null,
             'priority' => $this->priority,

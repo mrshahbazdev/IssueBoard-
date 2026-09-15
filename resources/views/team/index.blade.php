@@ -1,12 +1,12 @@
-<x-app-shell title="Team access">
+<x-app-shell :title="__('app.team.title')">
     <div class="mx-auto max-w-6xl">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">Workspace access</p>
-                <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-950">Team roles</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Give each person only the access they need. New registrations start as team members.</p>
+                <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">{{ __('app.team.eyebrow') }}</p>
+                <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-950">{{ __('app.team.heading') }}</h1>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{{ __('app.team.description') }}</p>
             </div>
-            <span class="self-start rounded-full bg-slate-950 px-3 py-1.5 text-xs font-extrabold text-white">{{ $users->count() }} people</span>
+            <span class="self-start rounded-full bg-slate-950 px-3 py-1.5 text-xs font-extrabold text-white">{{ trans_choice('app.team.people', $users->count(), ['count' => $users->count()]) }}</span>
         </div>
 
         <div class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -27,10 +27,10 @@
                 <table class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr class="text-left text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                            <th class="px-5 py-3.5">Person</th>
-                            <th class="px-5 py-3.5">Contact</th>
-                            <th class="px-5 py-3.5">Access role</th>
-                            <th class="px-5 py-3.5 text-right">Action</th>
+                            <th class="px-5 py-3.5">{{ __('app.team.person') }}</th>
+                            <th class="px-5 py-3.5">{{ __('app.team.contact') }}</th>
+                            <th class="px-5 py-3.5">{{ __('app.team.role') }}</th>
+                            <th class="px-5 py-3.5 text-right">{{ __('app.team.action') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -42,14 +42,14 @@
                                         <div>
                                             <p class="text-sm font-extrabold text-slate-900">{{ $user->name }}</p>
                                             @if (auth()->user()->is($user))
-                                                <p class="mt-0.5 text-xs font-medium text-orange-600">Your account</p>
+                                                <p class="mt-0.5 text-xs font-medium text-orange-600">{{ __('app.team.your_account') }}</p>
                                             @endif
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-5 py-4">
                                     <p class="text-sm font-medium text-slate-700">{{ $user->email }}</p>
-                                    <p class="mt-0.5 text-xs text-slate-400">{{ $user->phone ?: 'No phone added' }}</p>
+                                    <p class="mt-0.5 text-xs text-slate-400">{{ $user->phone ?: __('app.team.no_phone') }}</p>
                                 </td>
                                 <td class="px-5 py-4">
                                     <span class="inline-flex rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ring-1 ring-inset {{ $user->role->badgeClasses() }}">{{ $user->role->label() }}</span>
@@ -59,15 +59,15 @@
                                         <form method="POST" action="{{ route('team.role.update', $user) }}" class="flex items-center justify-end gap-2">
                                             @csrf
                                             @method('PATCH')
-                                            <select name="role" aria-label="Role for {{ $user->name }}" class="rounded-lg border-slate-300 bg-slate-50 py-2 text-xs font-semibold focus:border-orange-500 focus:ring-orange-500">
+                                            <select name="role" aria-label="{{ __('app.team.role_for', ['name' => $user->name]) }}" class="rounded-lg border-slate-300 bg-slate-50 py-2 text-xs font-semibold focus:border-orange-500 focus:ring-orange-500">
                                                 @foreach ($roles as $role)
                                                     <option value="{{ $role->value }}" @selected($user->role === $role)>{{ $role->label() }}</option>
                                                 @endforeach
                                             </select>
-                                            <button class="rounded-lg bg-slate-950 px-3 py-2 text-xs font-extrabold text-white hover:bg-slate-700">Save</button>
+                                            <button class="rounded-lg bg-slate-950 px-3 py-2 text-xs font-extrabold text-white hover:bg-slate-700">{{ __('app.team.save') }}</button>
                                         </form>
                                     @else
-                                        <p class="text-right text-xs font-medium text-slate-400">Protected</p>
+                                        <p class="text-right text-xs font-medium text-slate-400">{{ __('app.team.protected') }}</p>
                                     @endif
                                 </td>
                             </tr>

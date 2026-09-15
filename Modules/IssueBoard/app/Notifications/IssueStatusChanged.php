@@ -2,6 +2,8 @@
 
 namespace Modules\IssueBoard\Notifications;
 
+use App\Models\User;
+use App\Support\UserSmtpMailer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -23,12 +25,14 @@ class IssueStatusChanged extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return $this->actor instanceof User && $this->actor->mailSetting()->exists()
+            ? ['mail', 'database']
+            : ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        $message = (new MailMessage)
             ->subject(__('issueboard::issueboard.mail.status_subject', [
                 'title' => $this->issue->title,
                 'status' => $this->to->label(),
@@ -41,6 +45,11 @@ class IssueStatusChanged extends Notification implements ShouldQueue
             ]))
             ->line('**'.$this->issue->title.'**')
             ->action(__('issueboard::issueboard.mail.open_issue'), route('issueboard.show', $this->issue));
+
+        return app(UserSmtpMailer::class)->apply(
+            $message,
+            $this->actor instanceof User ? $this->actor : null
+        );
     }
 
     public function toArray(object $notifiable): array

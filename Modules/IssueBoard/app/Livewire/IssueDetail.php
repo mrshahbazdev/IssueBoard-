@@ -9,7 +9,6 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Modules\IssueBoard\Enums\IssueStatus;
 use Modules\IssueBoard\Models\Issue;
-use Modules\IssueBoard\Models\IssueComment;
 use Modules\IssueBoard\Notifications\IssueCommented;
 use Modules\IssueBoard\Support\RichText;
 
@@ -48,6 +47,7 @@ class IssueDetail extends Component
     public function startReply(int $commentId): void
     {
         $this->authorize('comment', $this->issue);
+        $this->issue->allComments()->findOrFail($commentId);
 
         $this->replyTo = $commentId;
         $this->isQuestion = false;
@@ -74,6 +74,10 @@ class IssueDetail extends Component
     {
         $this->authorize('comment', $this->issue);
         $this->body = RichText::clean($this->body) ?? '';
+
+        if ($this->replyTo) {
+            $this->issue->allComments()->findOrFail($this->replyTo);
+        }
 
         $this->validate([
             'body' => 'required|string|max:10000',
@@ -104,7 +108,8 @@ class IssueDetail extends Component
 
     public function deleteComment(int $commentId): void
     {
-        $comment = IssueComment::findOrFail($commentId);
+        $this->authorize('comment', $this->issue);
+        $comment = $this->issue->allComments()->findOrFail($commentId);
 
         abort_unless(
             $comment->user_id === auth()->id() || auth()->user()->can('delete', $this->issue),

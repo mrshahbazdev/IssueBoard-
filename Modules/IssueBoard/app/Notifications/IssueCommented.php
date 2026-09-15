@@ -2,6 +2,7 @@
 
 namespace Modules\IssueBoard\Notifications;
 
+use App\Support\UserSmtpMailer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +17,9 @@ class IssueCommented extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return $this->comment->user?->mailSetting()->exists()
+            ? ['mail', 'database']
+            : ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -25,7 +28,7 @@ class IssueCommented extends Notification implements ShouldQueue
             ? 'issueboard::issueboard.mail.question_subject'
             : 'issueboard::issueboard.mail.comment_subject';
 
-        return (new MailMessage)
+        $message = (new MailMessage)
             ->subject(__($key, ['title' => $this->comment->issue->title]))
             ->greeting(__('issueboard::issueboard.mail.greeting', ['name' => $notifiable->name]))
             ->line($this->comment->user->name.':')
@@ -34,6 +37,8 @@ class IssueCommented extends Notification implements ShouldQueue
                 __('issueboard::issueboard.mail.answer'),
                 route('issueboard.show', $this->comment->issue)
             );
+
+        return app(UserSmtpMailer::class)->apply($message, $this->comment->user);
     }
 
     public function toArray(object $notifiable): array

@@ -29,6 +29,7 @@ class RoleAccessTest extends TestCase
         $issue = Issue::create([
             'title' => 'Read-only check',
             'created_by' => $author->id,
+            'assigned_to' => $viewer->id,
             'status' => IssueStatus::New,
         ]);
 

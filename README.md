@@ -16,7 +16,9 @@ A standalone internal communication board for project changes, small issues, que
 - Status history and weekly digest command
 - Custom authentication, profile, and password screens
 - Role-based access with Admin, Manager, Developer, Team member, and Viewer roles
-- Admin team-role management
+- Admin team invitations, pending invites, resend/cancel actions, and role management
+- Personal SMTP settings managed from each profile, with encrypted passwords
+- Private issue access for the assigned user, Admins, and Managers
 
 ## Requirements
 
@@ -105,13 +107,21 @@ These credentials are intended only for local development.
 
 | Role | Access |
 |---|---|
-| Admin | Full access and team-role management |
-| Manager | Manage tasks, priorities, assignments, deletion, and every workflow stage |
-| Developer | Create, update, discuss, and move work through review, progress, and done |
-| Team member | Report work, update own reports, discuss, and submit items for review |
-| Viewer | Read-only board and conversation access |
+| Admin | Full workspace access, invitations, and team-role management |
+| Manager | See all issues and manage priorities, assignments, deletion, and every workflow stage |
+| Developer | Work on assigned issues and move them through review, progress, and done |
+| Team member | Work on assigned issues, discuss, and submit them for review |
+| Viewer | Read-only access to assigned issues and their conversations |
 
-Public registration creates a Team member account. Only an Admin can change roles.
+Regular users only see issues assigned to them. Admins and Managers can see all issues.
+
+Public registration creates a Team member account. Admins can invite users with a selected role, resend or cancel pending invitations, and change existing roles.
+
+## Personal SMTP
+
+Every user can configure an SMTP account from **Profile and security**. The SMTP password is encrypted using Laravel's application key and is never shown again. No `MAIL_*` values are required in `.env` for invitations or user-triggered notifications.
+
+An Admin must save SMTP settings before sending an invitation. Issue notifications use the SMTP account of the user who created the update. The weekly digest uses the first configured Admin or Manager SMTP account.
 
 ## Useful commands
 
@@ -122,7 +132,7 @@ npm run build
 php artisan issueboard:digest --dry-run
 ```
 
-The weekly digest is scheduled for Monday at 08:00 by default. Configure mail, queues, and the scheduler before enabling delivery in production.
+The weekly digest is scheduled for Monday at 08:00 by default. Configure an Admin or Manager SMTP account in the application and enable the scheduler before using it in production.
 
 For the Laravel scheduler, add this cron entry on the server:
 

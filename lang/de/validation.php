@@ -21,6 +21,7 @@ return [
     'min' => [
         'string' => ':attribute muss mindestens :min Zeichen enthalten.',
     ],
+    'not_regex' => 'Das Format von :attribute ist ungültig.',
     'password' => [
         'letters' => ':attribute muss mindestens einen Buchstaben enthalten.',
         'numbers' => ':attribute muss mindestens eine Zahl enthalten.',
@@ -53,6 +54,12 @@ return [
         'priority' => 'Priorität',
         'project_id' => 'Projekt',
         'role' => 'Rolle',
+        'host' => 'SMTP-Host',
+        'port' => 'SMTP-Port',
+        'scheme' => 'SMTP-Sicherheit',
+        'username' => 'SMTP-Benutzername',
+        'from_address' => 'Absender-E-Mail',
+        'from_name' => 'Absendername',
         'suggested_solution' => 'Lösungsvorschlag',
         'title' => 'Titel',
     ],

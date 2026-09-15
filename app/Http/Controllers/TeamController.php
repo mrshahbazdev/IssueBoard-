@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,10 @@ class TeamController extends Controller
         return view('team.index', [
             'users' => User::orderBy('name')->get(),
             'roles' => UserRole::cases(),
+            'invitations' => TeamInvitation::query()
+                ->whereNull('accepted_at')
+                ->latest()
+                ->get(),
         ]);
     }
 

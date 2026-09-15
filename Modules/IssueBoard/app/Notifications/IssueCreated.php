@@ -2,6 +2,7 @@
 
 namespace Modules\IssueBoard\Notifications;
 
+use App\Support\UserSmtpMailer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +17,9 @@ class IssueCreated extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return $this->issue->author?->mailSetting()->exists()
+            ? ['mail', 'database']
+            : ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -38,10 +41,12 @@ class IssueCreated extends Notification implements ShouldQueue
             $mail->line(__('issueboard::issueboard.contact').': '.$contact);
         }
 
-        return $mail->action(
+        $mail->action(
             __('issueboard::issueboard.mail.open_issue'),
             route('issueboard.show', $this->issue)
         );
+
+        return app(UserSmtpMailer::class)->apply($mail, $this->issue->author);
     }
 
     public function toArray(object $notifiable): array

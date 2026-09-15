@@ -1,9 +1,9 @@
-<x-app-shell title="Profile and security">
+<x-app-shell :title="__('app.profile.title')">
     <div class="mx-auto max-w-5xl">
         <div class="mb-7">
-            <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">Account settings</p>
-            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-950">Profile and security</h1>
-            <p class="mt-2 text-sm text-slate-500">Keep your contact details current and protect your account.</p>
+            <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">{{ __('app.profile.eyebrow') }}</p>
+            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-950">{{ __('app.profile.title') }}</h1>
+            <p class="mt-2 text-sm text-slate-500">{{ __('app.profile.description') }}</p>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
@@ -15,16 +15,16 @@
                         {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
                     </span>
                     <div>
-                        <h2 class="font-extrabold text-slate-950">Personal details</h2>
-                        <p class="mt-1 text-xs text-slate-500">Shown to teammates on tasks and comments.</p>
+                        <h2 class="font-extrabold text-slate-950">{{ __('app.profile.personal_details') }}</h2>
+                        <p class="mt-1 text-xs text-slate-500">{{ __('app.profile.personal_details_help') }}</p>
                     </div>
                 </div>
 
                 <div class="mt-6 space-y-5">
                     @foreach ([
-                        ['name', 'Full name', 'text', 'name'],
-                        ['email', 'Email address', 'email', 'email'],
-                        ['phone', 'Phone number', 'tel', 'tel'],
+                        ['name', __('app.profile.name'), 'text', 'name'],
+                        ['email', __('app.profile.email'), 'email', 'email'],
+                        ['phone', __('app.profile.phone'), 'tel', 'tel'],
                     ] as [$field, $label, $type, $autocomplete])
                         <div>
                             <label for="{{ $field }}" class="text-sm font-bold text-slate-700">{{ $label }}</label>
@@ -36,22 +36,22 @@
                     @endforeach
                 </div>
 
-                <button class="mt-6 rounded-xl bg-slate-950 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-slate-800">Save profile</button>
+                <button class="mt-6 rounded-xl bg-slate-950 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-slate-800">{{ __('app.profile.save') }}</button>
             </form>
 
             <form method="POST" action="{{ route('profile.password') }}" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 @csrf
                 @method('PUT')
                 <div>
-                    <h2 class="font-extrabold text-slate-950">Change password</h2>
-                    <p class="mt-1 text-xs text-slate-500">Use at least eight characters with letters and numbers.</p>
+                    <h2 class="font-extrabold text-slate-950">{{ __('app.profile.change_password') }}</h2>
+                    <p class="mt-1 text-xs text-slate-500">{{ __('app.profile.password_help') }}</p>
                 </div>
 
                 <div class="mt-6 space-y-5">
                     @foreach ([
-                        ['current_password', 'Current password', 'current-password'],
-                        ['password', 'New password', 'new-password'],
-                        ['password_confirmation', 'Confirm new password', 'new-password'],
+                        ['current_password', __('app.profile.current_password'), 'current-password'],
+                        ['password', __('app.profile.new_password'), 'new-password'],
+                        ['password_confirmation', __('app.profile.confirm_password'), 'new-password'],
                     ] as [$field, $label, $autocomplete])
                         <div>
                             <label for="{{ $field }}" class="text-sm font-bold text-slate-700">{{ $label }}</label>
@@ -62,7 +62,7 @@
                     @endforeach
                 </div>
 
-                <button class="mt-6 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50">Update password</button>
+                <button class="mt-6 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50">{{ __('app.profile.update_password') }}</button>
             </form>
         </div>
     </div>

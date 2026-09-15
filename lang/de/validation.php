@@ -1,0 +1,59 @@
+<?php
+
+return [
+    'between' => [
+        'numeric' => ':attribute muss zwischen :min und :max liegen.',
+    ],
+    'boolean' => ':attribute muss wahr oder falsch sein.',
+    'confirmed' => 'Die Bestätigung für :attribute stimmt nicht überein.',
+    'current_password' => 'Das Passwort ist falsch.',
+    'date' => ':attribute muss ein gültiges Datum sein.',
+    'email' => ':attribute muss eine gültige E-Mail-Adresse sein.',
+    'exists' => 'Der ausgewählte Wert für :attribute ist ungültig.',
+    'file' => ':attribute muss eine Datei sein.',
+    'in' => 'Der ausgewählte Wert für :attribute ist ungültig.',
+    'integer' => ':attribute muss eine ganze Zahl sein.',
+    'max' => [
+        'file' => ':attribute darf nicht größer als :max Kilobyte sein.',
+        'string' => ':attribute darf höchstens :max Zeichen enthalten.',
+    ],
+    'mimes' => ':attribute muss einen der folgenden Dateitypen haben: :values.',
+    'min' => [
+        'string' => ':attribute muss mindestens :min Zeichen enthalten.',
+    ],
+    'password' => [
+        'letters' => ':attribute muss mindestens einen Buchstaben enthalten.',
+        'numbers' => ':attribute muss mindestens eine Zahl enthalten.',
+    ],
+    'required' => ':attribute ist erforderlich.',
+    'string' => ':attribute muss Text sein.',
+    'unique' => ':attribute ist bereits vergeben.',
+    'uploaded' => ':attribute konnte nicht hochgeladen werden.',
+    'url' => ':attribute muss eine gültige URL sein.',
+
+    'custom' => [],
+
+    'attributes' => [
+        'assigned_to' => 'Zuständigkeit',
+        'body' => 'Kommentar',
+        'commentFiles.*' => 'Anhang',
+        'contact_email' => 'Kontakt-E-Mail',
+        'contact_name' => 'Kontaktname',
+        'contact_phone' => 'Kontakttelefon',
+        'current_password' => 'Aktuelles Passwort',
+        'description' => 'Beschreibung',
+        'due_date' => 'Fälligkeitsdatum',
+        'email' => 'E-Mail-Adresse',
+        'files.*' => 'Datei',
+        'links.*.label' => 'Link-Bezeichnung',
+        'links.*.url' => 'Link-URL',
+        'locale' => 'Sprache',
+        'name' => 'Name',
+        'password' => 'Passwort',
+        'priority' => 'Priorität',
+        'project_id' => 'Projekt',
+        'role' => 'Rolle',
+        'suggested_solution' => 'Lösungsvorschlag',
+        'title' => 'Titel',
+    ],
+];

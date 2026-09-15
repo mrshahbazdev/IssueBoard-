@@ -13,33 +13,37 @@
     @endunless
 </head>
 <body class="min-h-full bg-slate-950 font-sans text-slate-900 antialiased">
-<main class="grid min-h-screen lg:grid-cols-[minmax(0,1.05fr)_minmax(520px,.95fr)]">
+<main class="relative grid min-h-screen lg:grid-cols-[minmax(0,1.05fr)_minmax(520px,.95fr)]">
+    <div class="absolute right-5 top-5 z-20">
+        <x-language-switcher/>
+    </div>
+
     <section class="relative hidden overflow-hidden border-r border-white/10 bg-slate-950 p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
         <div class="absolute inset-0 opacity-80" style="background: radial-gradient(circle at 25% 15%, rgba(34,211,238,.16), transparent 28rem), radial-gradient(circle at 85% 80%, rgba(251,146,60,.18), transparent 30rem)"></div>
         <div class="relative flex items-center gap-3">
             <x-brand-mark class="h-12 w-12"/>
             <div>
                 <p class="text-lg font-extrabold tracking-tight">IssueBoard</p>
-                <p class="text-xs font-medium text-slate-400">Internal work, clearly owned.</p>
+                <p class="text-xs font-medium text-slate-400">{{ __('app.brand_tagline') }}</p>
             </div>
         </div>
 
         <div class="relative max-w-xl">
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-orange-300">Less noise. More progress.</p>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-orange-300">{{ __('app.auth_intro.eyebrow') }}</p>
             <h1 class="mt-6 text-5xl font-extrabold leading-[1.08] tracking-tight xl:text-6xl">
-                Keep every project change in sight.
+                {{ __('app.auth_intro.title') }}
             </h1>
             <p class="mt-6 max-w-lg text-lg leading-8 text-slate-300">
-                Capture context, assign the next owner, ask questions, and keep the full decision trail attached to the work.
+                {{ __('app.auth_intro.description') }}
             </p>
         </div>
 
         <div class="relative grid grid-cols-4 gap-2">
             @foreach ([
-                ['New', 'bg-red-500'],
-                ['Review', 'bg-amber-500'],
-                ['In progress', 'bg-blue-500'],
-                ['Done', 'bg-emerald-500'],
+                [__('issueboard::issueboard.status.new'), 'bg-red-500'],
+                [__('issueboard::issueboard.status.review'), 'bg-amber-500'],
+                [__('issueboard::issueboard.status.in_progress'), 'bg-blue-500'],
+                [__('issueboard::issueboard.status.done'), 'bg-emerald-500'],
             ] as [$label, $color])
                 <div class="rounded-xl border border-white/10 bg-white/5 p-3">
                     <span class="block h-2 w-8 rounded-full {{ $color }}"></span>
@@ -55,7 +59,7 @@
                 <x-brand-mark class="h-11 w-11"/>
                 <div>
                     <p class="font-extrabold tracking-tight">IssueBoard</p>
-                    <p class="text-xs text-slate-500">Internal work, clearly owned.</p>
+                    <p class="text-xs text-slate-500">{{ __('app.brand_tagline') }}</p>
                 </div>
             </div>
 

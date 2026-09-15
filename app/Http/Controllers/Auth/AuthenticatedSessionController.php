@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             throw ValidationException::withMessages([
-                'email' => __('Too many login attempts. Please try again in :seconds seconds.', [
+                'email' => __('app.login.too_many_attempts', [
                     'seconds' => RateLimiter::availableIn($key),
                 ]),
             ]);
@@ -43,7 +43,7 @@ class AuthenticatedSessionController extends Controller
             RateLimiter::hit($key, 60);
 
             throw ValidationException::withMessages([
-                'email' => __('These credentials do not match our records.'),
+                'email' => __('app.login.invalid_credentials'),
             ]);
         }
 

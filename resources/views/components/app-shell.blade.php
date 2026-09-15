@@ -20,22 +20,22 @@
     <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
         <div class="mx-auto flex h-17 max-w-[1600px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <div class="flex min-w-0 items-center gap-5">
-                <a href="{{ route('issueboard.index') }}" class="flex min-w-0 items-center gap-3" aria-label="IssueBoard home">
+                <a href="{{ route('issueboard.index') }}" class="flex min-w-0 items-center gap-3" aria-label="{{ __('app.navigation.home') }}">
                     <x-brand-mark class="h-10 w-10 shrink-0 rounded-xl"/>
                     <div class="hidden min-w-0 sm:block">
                         <span class="block truncate text-sm font-extrabold tracking-tight text-slate-950">IssueBoard</span>
-                        <span class="block truncate text-[11px] font-medium text-slate-400">Internal work, clearly owned.</span>
+                        <span class="block truncate text-[11px] font-medium text-slate-400">{{ __('app.brand_tagline') }}</span>
                     </div>
                 </a>
 
-                <nav class="hidden items-center gap-1 border-l border-slate-200 pl-5 md:flex" aria-label="Main navigation">
+                <nav class="hidden items-center gap-1 border-l border-slate-200 pl-5 md:flex" aria-label="{{ __('app.navigation.main') }}">
                     <a href="{{ route('issueboard.index') }}"
                        @class([
                            'rounded-lg px-3 py-2 text-sm font-bold transition',
                            'bg-slate-950 text-white' => request()->routeIs('issueboard.*'),
                            'text-slate-500 hover:bg-slate-100 hover:text-slate-900' => ! request()->routeIs('issueboard.*'),
                        ])>
-                        Board
+                        {{ __('app.navigation.board') }}
                     </a>
                     @if (auth()->user()->canManageTeam())
                         <a href="{{ route('team.index') }}"
@@ -44,13 +44,15 @@
                                'bg-slate-950 text-white' => request()->routeIs('team.*'),
                                'text-slate-500 hover:bg-slate-100 hover:text-slate-900' => ! request()->routeIs('team.*'),
                            ])>
-                            Team
+                            {{ __('app.navigation.team') }}
                         </a>
                     @endif
                 </nav>
             </div>
 
             <div class="flex items-center gap-2 sm:gap-3">
+                <x-language-switcher compact/>
+
                 @can('create', \Modules\IssueBoard\Models\Issue::class)
                     <a href="{{ route('issueboard.create') }}"
                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-3.5 py-2.5 text-sm font-extrabold text-white shadow-sm transition hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 sm:px-4">
@@ -81,19 +83,19 @@
                         </div>
                         <a href="{{ route('profile.edit') }}" class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-950">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.1a7.5 7.5 0 0 1 15 0 17.9 17.9 0 0 1-15 0Z"/></svg>
-                            Profile and security
+                            {{ __('app.navigation.profile') }}
                         </a>
                         @if (auth()->user()->canManageTeam())
                             <a href="{{ route('team.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-950 md:hidden">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.1 9.1 0 0 0 3.74-.48 3.75 3.75 0 0 0-5.73-3.26M18 18.72v-.01c0-1.31-.34-2.54-.94-3.61M18 18.72v.13A12 12 0 0 1 12 20.25c-2.18 0-4.23-.58-6-1.59v-.16a6 6 0 0 1 11.06-3.4M15 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
-                                Manage team
+                                {{ __('app.navigation.manage_team') }}
                             </a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-700">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
-                                Sign out
+                                {{ __('app.navigation.sign_out') }}
                             </button>
                         </form>
                     </div>

@@ -11,6 +11,7 @@ use Modules\IssueBoard\Enums\IssueStatus;
 use Modules\IssueBoard\Models\Issue;
 use Modules\IssueBoard\Models\IssueComment;
 use Modules\IssueBoard\Notifications\IssueCommented;
+use Modules\IssueBoard\Support\RichText;
 
 class IssueDetail extends Component
 {
@@ -72,6 +73,7 @@ class IssueDetail extends Component
     public function addComment(): void
     {
         $this->authorize('comment', $this->issue);
+        $this->body = RichText::clean($this->body) ?? '';
 
         $this->validate([
             'body' => 'required|string|max:10000',

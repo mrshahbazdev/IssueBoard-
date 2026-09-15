@@ -80,7 +80,9 @@
 
                 <div class="mt-6">
                     @if ($issue->description)
-                        <div class="whitespace-pre-line text-sm leading-7 text-slate-700">{{ $issue->description }}</div>
+                        <div class="issueboard-rich-text text-sm leading-7 text-slate-700">
+                            {!! \Modules\IssueBoard\Support\RichText::clean($issue->description) !!}
+                        </div>
                     @else
                         <p class="text-sm italic text-slate-400">{{ __('issueboard::issueboard.no_description') }}</p>
                     @endif
@@ -95,7 +97,9 @@
                             </svg>
                             {{ __('issueboard::issueboard.suggested_solution') }}
                         </div>
-                        <div class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">{{ $issue->suggested_solution }}</div>
+                        <div class="issueboard-rich-text mt-3 text-sm leading-6 text-slate-700">
+                            {!! \Modules\IssueBoard\Support\RichText::clean($issue->suggested_solution) !!}
+                        </div>
                     </div>
                 @endif
             </section>
@@ -158,9 +162,7 @@
                 </section>
             @endif
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-                     x-data
-                     x-on:focus-comment-box.window="$nextTick(() => $refs.commentBox.focus())">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div class="flex items-center gap-3">
                         <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
@@ -216,7 +218,9 @@
                                         <time class="text-xs text-slate-400">{{ $comment->created_at->format('d.m.Y H:i') }}</time>
                                     </div>
 
-                                    <div class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">{{ $comment->body }}</div>
+                                    <div class="issueboard-rich-text mt-2 text-sm leading-6 text-slate-700">
+                                        {!! \Modules\IssueBoard\Support\RichText::clean($comment->body) !!}
+                                    </div>
 
                                     @if ($comment->attachments->isNotEmpty())
                                         <div class="mt-3 flex flex-wrap gap-2">
@@ -266,7 +270,9 @@
                                                 <p class="text-sm font-bold text-slate-900">{{ $reply->user->name }}</p>
                                                 <time class="text-xs text-slate-400">{{ $reply->created_at->format('d.m.Y H:i') }}</time>
                                             </div>
-                                            <div class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">{{ $reply->body }}</div>
+                                            <div class="issueboard-rich-text mt-2 text-sm leading-6 text-slate-700">
+                                                {!! \Modules\IssueBoard\Support\RichText::clean($reply->body) !!}
+                                            </div>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -296,9 +302,13 @@
                     @endif
 
                     <label for="comment-body" class="sr-only">{{ __('issueboard::issueboard.comment_placeholder') }}</label>
-                    <textarea id="comment-body" x-ref="commentBox" wire:model="body" rows="4"
-                              placeholder="{{ __('issueboard::issueboard.comment_placeholder') }}"
-                              class="w-full resize-y rounded-xl border-slate-300 bg-slate-50 text-sm leading-6 placeholder:text-slate-400 focus:border-[#ff9200] focus:bg-white focus:ring-[#ff9200]"></textarea>
+                    <x-rich-text-editor
+                        id="comment-body"
+                        wire:model="body"
+                        :placeholder="__('issueboard::issueboard.comment_placeholder')"
+                        min-height="min-h-28"
+                        focus-on-comment
+                    />
                     @error('body') <p class="mt-1.5 text-xs font-medium text-rose-600">{{ $message }}</p> @enderror
 
                     <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -339,7 +349,7 @@
                     </div>
                 @else
                     <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-500">
-                        Your viewer role has read-only access to this conversation.
+                        {{ __('issueboard::issueboard.viewer_read_only') }}
                     </div>
                 @endcan
             </section>

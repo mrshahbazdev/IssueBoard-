@@ -34,15 +34,16 @@ return [
         'submit' => 'Sign in',
         'new_user' => 'New to IssueBoard?',
         'create_account' => 'Create an account',
+        'invitation_only' => 'This workspace is invitation-only. Ask an administrator to invite you.',
         'too_many_attempts' => 'Too many login attempts. Please try again in :seconds seconds.',
         'invalid_credentials' => 'These credentials do not match our records.',
     ],
 
     'register' => [
         'title' => 'Create account',
-        'eyebrow' => 'Join the workspace',
-        'heading' => 'Create your account',
-        'description' => 'New accounts start as team members. An admin can adjust access later.',
+        'eyebrow' => 'Create the workspace',
+        'heading' => 'Set up the owner account',
+        'description' => 'The first account becomes the workspace Admin and can invite everyone else.',
         'name' => 'Full name',
         'name_placeholder' => 'Your name',
         'email' => 'Email address',
@@ -57,6 +58,7 @@ return [
         'submit' => 'Create account',
         'existing_user' => 'Already have an account?',
         'sign_in' => 'Sign in',
+        'closed' => 'The workspace owner is already set up. Ask an administrator to send you an invitation.',
     ],
 
     'profile' => [

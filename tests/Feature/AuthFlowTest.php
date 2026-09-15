@@ -37,7 +37,7 @@ class AuthFlowTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_registration_creates_a_team_member(): void
+    public function test_first_registration_creates_the_workspace_admin(): void
     {
         $this->post(route('register.store'), [
             'name' => 'New Reporter',
@@ -50,9 +50,41 @@ class AuthFlowTest extends TestCase
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'new@issueboard.test',
-            'role' => UserRole::Member->value,
+            'role' => UserRole::Admin->value,
             'phone' => '+49 555 1000',
         ]);
+    }
+
+    public function test_registration_closes_after_the_workspace_admin_exists(): void
+    {
+        User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->get(route('register'))
+            ->assertRedirect(route('login'))
+            ->assertSessionHas('status', 'The workspace owner is already set up. Ask an administrator to send you an invitation.');
+
+        $this->post(route('register.store'), [
+            'name' => 'Another User',
+            'email' => 'another@issueboard.test',
+            'password' => 'Secret123',
+            'password_confirmation' => 'Secret123',
+        ])->assertRedirect(route('login'));
+
+        $this->assertDatabaseMissing('users', ['email' => 'another@issueboard.test']);
+    }
+
+    public function test_login_only_offers_registration_before_the_first_account_exists(): void
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('Create an account');
+
+        User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertDontSee('Create an account')
+            ->assertSee('This workspace is invitation-only.');
     }
 
     public function test_profile_and_password_can_be_updated(): void

@@ -100,6 +100,7 @@ return [
         'smtp_test_failed' => 'The SMTP connection failed. Check the host, port, security, and credentials.',
         'smtp_remove' => 'Remove SMTP settings',
         'smtp_removed' => 'SMTP settings removed.',
+        'smtp_routes_unavailable' => 'Email settings are temporarily unavailable because the deployment cache is out of date. Ask an administrator to refresh the Laravel application cache.',
     ],
 
     'team' => [
@@ -141,6 +142,7 @@ return [
         'smtp_required' => 'Set up your SMTP account in Profile before sending invitations.',
         'smtp_connected' => 'Your SMTP account will send this invitation',
         'smtp_setup' => 'Set up your SMTP account first',
+        'invitation_routes_unavailable' => 'Team invitations are temporarily unavailable because the deployment cache is out of date. Refresh the Laravel application cache to restore them.',
     ],
 
     'invitation' => [

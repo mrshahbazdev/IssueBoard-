@@ -26,6 +26,10 @@ class User extends Authenticatable
         'role',
         'password',
         'invited_by',
+        'two_factor_enabled',
+        'two_factor_code',
+        'two_factor_expires_at',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -36,6 +40,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_code',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -49,6 +55,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
+            'two_factor_enabled' => 'boolean',
+            'two_factor_expires_at' => 'datetime',
         ];
     }
 

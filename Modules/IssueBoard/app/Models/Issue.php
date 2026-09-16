@@ -214,6 +214,24 @@ class Issue extends Model
         }
     }
 
+    public function logActivity(
+        string $action,
+        ?int $userId = null,
+        ?string $description = null,
+        ?string $fromValue = null,
+        ?string $toValue = null,
+        ?string $field = null,
+    ): IssueActivity {
+        return IssueActivity::create([
+            'issue_id' => $this->id,
+            'user_id' => $userId ?: auth()->id() ?: $this->created_by,
+            'action' => $action,
+            'description' => $description ?: ($field ? "{$field} changed" : null),
+            'from_value' => $fromValue,
+            'to_value' => $toValue,
+        ]);
+    }
+
     public function watchers(): Collection
     {
         $userModel = config('issueboard.user_model');

@@ -156,20 +156,20 @@ class ProfileController extends Controller
                 \Illuminate\Support\Str::random(10),
             ];
 
-            $user->update([
+            $user->forceFill([
                 'two_factor_enabled' => true,
                 'two_factor_recovery_codes' => json_encode($recoveryCodes),
-            ]);
+            ])->save();
 
             return back()->with('status', __('Two-Factor Authentication has been enabled. Save your emergency recovery codes: ') . implode(', ', $recoveryCodes));
         }
 
-        $user->update([
+        $user->forceFill([
             'two_factor_enabled' => false,
             'two_factor_code' => null,
             'two_factor_expires_at' => null,
             'two_factor_recovery_codes' => null,
-        ]);
+        ])->save();
 
         return back()->with('status', __('Two-Factor Authentication has been disabled.'));
     }

@@ -71,6 +71,8 @@ class IssueDetail extends Component
 
     public function addChecklistItem(): void
     {
+        $this->authorize('update', $this->issue);
+
         $title = trim($this->newChecklistTitle);
         if ($title === '') {
             return;
@@ -108,6 +110,8 @@ class IssueDetail extends Component
 
     public function deleteChecklistItem(int $itemId): void
     {
+        $this->authorize('update', $this->issue);
+
         $item = $this->issue->checklistItems()->findOrFail($itemId);
         $title = $item->title;
         $item->delete();
@@ -123,6 +127,8 @@ class IssueDetail extends Component
 
     public function toggleLabel(int $labelId): void
     {
+        $this->authorize('update', $this->issue);
+
         $label = Label::findOrFail($labelId);
         $this->issue->labels()->toggle($labelId);
         
@@ -138,6 +144,8 @@ class IssueDetail extends Component
 
     public function createAndAttachLabel(): void
     {
+        $this->authorize('update', $this->issue);
+
         $name = trim($this->newLabelName);
         if ($name === '') {
             return;
@@ -179,6 +187,8 @@ class IssueDetail extends Component
 
     public function updateEstimate(): void
     {
+        $this->authorize('update', $this->issue);
+
         $hours = (float) $this->newEstimate;
         if ($hours >= 0) {
             $this->issue->update(['estimated_hours' => $hours]);

@@ -26,17 +26,36 @@ class IssuePolicy
 
     public function update(Model $user, Issue $issue): bool
     {
-        return $this->view($user, $issue) && (in_array(static::roleOf($user), [
-            UserRole::Admin->value,
-            UserRole::Manager->value,
-            UserRole::Developer->value,
-        ], true)
-            || $issue->created_by === $user->getKey());
+        if (! $this->view($user, $issue)) {
+            return false;
+        }
+
+        $creator = $issue->author;
+        $isCreatedByOwner = $creator && ($creator->role === UserRole::Admin || (int) $creator->id === (int) $issue->team_owner_id);
+
+        // If the task was created by the workspace owner / admin:
+        // ONLY the owner who created it can edit it. Team members CANNOT edit it!
+        if ($isCreatedByOwner) {
+            return (int) $user->getKey() === (int) $issue->created_by;
+        }
+
+        // For tasks created by regular members:
+        // Workspace Admin can manage, or the member who created it can edit
+        if (static::roleOf($user) === UserRole::Admin->value && (int) $issue->team_owner_id === (int) $user->teamOwnerId()) {
+            return true;
+        }
+
+        return (int) $issue->created_by === (int) $user->getKey();
     }
 
     public function delete(Model $user, Issue $issue): bool
     {
-        return in_array(static::roleOf($user), [UserRole::Admin->value, UserRole::Manager->value], true);
+        if (! $this->view($user, $issue)) {
+            return false;
+        }
+
+        return (int) $issue->created_by === (int) $user->getKey()
+            || (static::roleOf($user) === UserRole::Admin->value && (int) $issue->team_owner_id === (int) $user->teamOwnerId());
     }
 
     public function comment(Model $user, Issue $issue): bool

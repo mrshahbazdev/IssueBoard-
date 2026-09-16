@@ -180,63 +180,137 @@
     </section>
 
     @if ($viewMode === 'calendar')
-        <!-- Calendar View -->
-        <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 space-y-4">
+        @php
+            $weekDays = app()->getLocale() === 'de' 
+                ? [
+                    ['short' => 'Mo', 'full' => 'Montag'],
+                    ['short' => 'Di', 'full' => 'Dienstag'],
+                    ['short' => 'Mi', 'full' => 'Mittwoch'],
+                    ['short' => 'Do', 'full' => 'Donnerstag'],
+                    ['short' => 'Fr', 'full' => 'Freitag'],
+                    ['short' => 'Sa', 'full' => 'Samstag'],
+                    ['short' => 'So', 'full' => 'Sonntag'],
+                ] 
+                : [
+                    ['short' => 'Mon', 'full' => 'Monday'],
+                    ['short' => 'Tue', 'full' => 'Tuesday'],
+                    ['short' => 'Wed', 'full' => 'Wednesday'],
+                    ['short' => 'Thu', 'full' => 'Thursday'],
+                    ['short' => 'Fri', 'full' => 'Friday'],
+                    ['short' => 'Sat', 'full' => 'Saturday'],
+                    ['short' => 'Sun', 'full' => 'Sunday'],
+                ];
+            $monthTotalIssues = collect($calendarDays)->sum(fn ($d) => $d['issues']->count());
+        @endphp
+
+        <!-- Redesigned Calendar View -->
+        <section class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-xl shadow-slate-900/5">
             <!-- Calendar Navigation Header -->
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-xl font-extrabold text-slate-950">{{ $calendarTitle }}</h2>
-                    <button type="button" wire:click="currentMonth" class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
-                        {{ __('issueboard::issueboard.today') ?? 'Today' }}
-                    </button>
+            <div class="flex flex-col gap-4 border-b border-slate-200/80 bg-gradient-to-b from-white to-slate-50/50 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-wrap items-center gap-3">
+                    <h2 class="text-2xl font-black tracking-tight text-slate-950 capitalize">{{ $calendarTitle }}</h2>
+                    <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-extrabold text-orange-700 ring-1 ring-inset ring-orange-200">
+                        {{ $monthTotalIssues }} {{ __('issueboard::issueboard.open') ?? 'Tasks' }}
+                    </span>
                 </div>
-                <div class="flex items-center gap-1">
-                    <button type="button" wire:click="previousMonth" class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 transition">
-                        <svg class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                        </svg>
-                    </button>
-                    <button type="button" wire:click="nextMonth" class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 transition">
-                        <svg class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
-                    </button>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Status Legend -->
+                    <div class="hidden items-center gap-3 pr-2 lg:flex text-xs font-semibold text-slate-500">
+                        @foreach ($statuses as $status)
+                            <span class="inline-flex items-center gap-1.5">
+                                <span class="h-2.5 w-2.5 rounded-full" style="background-color: {{ $status->color() }}"></span>
+                                {{ $status->label() }}
+                            </span>
+                        @endforeach
+                    </div>
+
+                    <!-- Month Controls -->
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" wire:click="previousMonth" 
+                                class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-xs transition hover:border-slate-300 hover:bg-slate-50 active:scale-95">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                            </svg>
+                        </button>
+                        <button type="button" wire:click="currentMonth" 
+                                class="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-extrabold text-slate-800 shadow-xs transition hover:border-slate-300 hover:bg-slate-50 active:scale-95">
+                            {{ __('issueboard::issueboard.today') }}
+                        </button>
+                        <button type="button" wire:click="nextMonth" 
+                                class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-xs transition hover:border-slate-300 hover:bg-slate-50 active:scale-95">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Calendar Grid -->
-            <div class="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 text-center text-xs font-extrabold">
-                <div class="bg-slate-50 py-2 text-slate-600">Mon</div>
-                <div class="bg-slate-50 py-2 text-slate-600">Tue</div>
-                <div class="bg-slate-50 py-2 text-slate-600">Wed</div>
-                <div class="bg-slate-50 py-2 text-slate-600">Thu</div>
-                <div class="bg-slate-50 py-2 text-slate-600">Fri</div>
-                <div class="bg-slate-50 py-2 text-slate-600">Sat</div>
-                <div class="bg-slate-50 py-2 text-slate-600">Sun</div>
+            <!-- Calendar Days Header -->
+            <div class="grid grid-cols-7 border-b border-slate-200/80 bg-slate-100/70 text-center text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                @foreach ($weekDays as $idx => $day)
+                    <div class="py-3 px-2 {{ $idx >= 5 ? 'text-slate-400 bg-slate-100' : '' }}">
+                        <span class="hidden md:inline">{{ $day['full'] }}</span>
+                        <span class="md:hidden">{{ $day['short'] }}</span>
+                    </div>
+                @endforeach
+            </div>
 
-                @foreach ($calendarDays as $dayInfo)
-                    <div class="min-h-28 bg-white p-2 text-left flex flex-col justify-between transition {{ ! $dayInfo['isCurrentMonth'] ? 'bg-slate-50/60 text-slate-400' : '' }}">
+            <!-- Calendar Grid -->
+            <div class="grid grid-cols-7 divide-x divide-y divide-slate-200/80 bg-slate-200/50">
+                @foreach ($calendarDays as $dayIndex => $dayInfo)
+                    @php
+                        $isWeekend = in_array($dayInfo['date']->dayOfWeekIso, [6, 7], true);
+                    @endphp
+                    <div class="min-h-[145px] sm:min-h-[165px] p-2 sm:p-2.5 flex flex-col justify-between transition-colors {{ ! $dayInfo['isCurrentMonth'] ? 'bg-slate-50/70 text-slate-400' : ($isWeekend ? 'bg-slate-50/40' : 'bg-white hover:bg-orange-50/10') }}">
+                        <!-- Top Cell Header: Date Number & Count -->
                         <div class="flex items-center justify-between">
-                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold {{ $dayInfo['isToday'] ? 'bg-orange-500 text-white font-extrabold' : ($dayInfo['isCurrentMonth'] ? 'text-slate-900' : 'text-slate-400') }}">
-                                {{ $dayInfo['date']->format('j') }}
-                            </span>
+                            @if ($dayInfo['isToday'])
+                                <span class="flex h-7 w-7 items-center justify-center rounded-xl bg-orange-500 text-xs font-black text-white shadow-md shadow-orange-500/30 ring-4 ring-orange-100">
+                                    {{ $dayInfo['date']->format('j') }}
+                                </span>
+                            @else
+                                <span class="flex h-7 w-7 items-center justify-center rounded-xl text-xs font-extrabold {{ $dayInfo['isCurrentMonth'] ? 'text-slate-800' : 'text-slate-400 opacity-60' }}">
+                                    {{ $dayInfo['date']->format('j') }}
+                                </span>
+                            @endif
+
                             @if ($dayInfo['issues']->isNotEmpty())
-                                <span class="text-[10px] font-bold text-slate-400">
-                                    {{ $dayInfo['issues']->count() }} {{ trans_choice('app.issues', $dayInfo['issues']->count()) ?? '' }}
+                                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                                    {{ $dayInfo['issues']->count() }}
                                 </span>
                             @endif
                         </div>
 
-                        <div class="mt-1 space-y-1 overflow-y-auto max-h-24">
+                        <!-- Issues List inside Day Cell -->
+                        <div class="mt-2 space-y-1.5 overflow-y-auto max-h-28 pr-0.5 scrollbar-thin">
                             @foreach ($dayInfo['issues'] as $cIssue)
                                 <a href="{{ route('issueboard.show', $cIssue) }}" 
                                    title="{{ $cIssue->title }}"
-                                   class="block truncate rounded px-1.5 py-0.5 text-[11px] font-semibold text-slate-800 transition hover:bg-orange-50 hover:text-orange-950 border-l-2"
-                                   style="border-color: {{ $cIssue->status->color() }}; background-color: {{ $cIssue->status->tint() }}">
-                                    #{{ $cIssue->id }} {{ $cIssue->title }}
+                                   class="group block rounded-xl border border-slate-200/90 bg-white p-2 shadow-xs transition duration-150 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                                   style="border-left-width: 4px; border-left-color: {{ $cIssue->status->color() }};">
+                                    <div class="flex items-center justify-between gap-1.5">
+                                        <div class="flex items-center gap-1 min-w-0">
+                                            @if ($cIssue->priority === 1 || $cIssue->priority === 4)
+                                                <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                                            @endif
+                                            <span class="font-mono text-[10px] font-extrabold text-slate-400 group-hover:text-orange-600 shrink-0">#{{ $cIssue->id }}</span>
+                                            <p class="truncate text-xs font-bold text-slate-800 group-hover:text-orange-950">{{ $cIssue->title }}</p>
+                                        </div>
+
+                                        @if ($cIssue->assignee)
+                                            <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[9px] font-black text-white"
+                                                  title="{{ $cIssue->assignee->name }}">
+                                                {{ mb_strtoupper(mb_substr($cIssue->assignee->name, 0, 1)) }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 </a>
                             @endforeach
                         </div>
+
+                        <div class="pt-1"></div>
                     </div>
                 @endforeach
             </div>

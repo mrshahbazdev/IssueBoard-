@@ -259,6 +259,7 @@ class Board extends Component
             'hasFilters' => $hasFilters,
             'calendarDays' => $calendarDays,
             'calendarTitle' => $calendarTitle,
+            'viewMode' => $this->viewMode,
         ])->layout('issueboard::layouts.master');
     }
 }

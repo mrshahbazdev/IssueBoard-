@@ -30,20 +30,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $teamUsers = collect([
-            'manager' => ['name' => 'Project Manager', 'email' => 'manager@issueboard.test', 'role' => UserRole::Manager],
-            'developer' => ['name' => 'Development Team', 'email' => 'developer@issueboard.test', 'role' => UserRole::Developer],
-            'member' => ['name' => 'Team Member', 'email' => 'member@issueboard.test', 'role' => UserRole::Member],
-            'viewer' => ['name' => 'Read-only Viewer', 'email' => 'viewer@issueboard.test', 'role' => UserRole::Viewer],
-        ])->map(function (array $data) use ($admin) {
-            return User::updateOrCreate(
-                ['email' => $data['email']],
-                $data + ['password' => 'password', 'email_verified_at' => now(), 'invited_by' => $admin->id]
-            );
-        });
-
-        $users = $teamUsers->put('admin', $admin);
-
         $projects = collect([
             ['name' => 'Website', 'description' => 'Public website improvements and content.', 'color' => '#f97316', 'team_owner_id' => $admin->id],
             ['name' => 'Customer Portal', 'description' => 'Account and service experience.', 'color' => '#0891b2', 'team_owner_id' => $admin->id],
@@ -59,7 +45,7 @@ class DatabaseSeeder extends Seeder
                 'priority' => 1,
                 'project_id' => $projects[0]->id,
                 'team_owner_id' => $admin->id,
-                'assigned_to' => $users['manager']->id,
+                'assigned_to' => null,
             ],
             [
                 'title' => 'Confirm onboarding email wording',
@@ -69,7 +55,7 @@ class DatabaseSeeder extends Seeder
                 'priority' => 2,
                 'project_id' => $projects[1]->id,
                 'team_owner_id' => $admin->id,
-                'assigned_to' => $users['manager']->id,
+                'assigned_to' => null,
             ],
             [
                 'title' => 'Improve file upload feedback',
@@ -79,7 +65,7 @@ class DatabaseSeeder extends Seeder
                 'priority' => 2,
                 'project_id' => $projects[1]->id,
                 'team_owner_id' => $admin->id,
-                'assigned_to' => $users['developer']->id,
+                'assigned_to' => null,
             ],
             [
                 'title' => 'Document weekly review owner',
@@ -88,7 +74,7 @@ class DatabaseSeeder extends Seeder
                 'priority' => 3,
                 'project_id' => $projects[2]->id,
                 'team_owner_id' => $admin->id,
-                'assigned_to' => $users['member']->id,
+                'assigned_to' => null,
                 'closed_at' => now(),
             ],
         ];
@@ -97,9 +83,9 @@ class DatabaseSeeder extends Seeder
             Issue::updateOrCreate(
                 ['title' => $sample['title']],
                 $sample + [
-                    'created_by' => $users['member']->id,
-                    'contact_name' => $users['member']->name,
-                    'contact_email' => $users['member']->email,
+                    'created_by' => $admin->id,
+                    'contact_name' => $admin->name,
+                    'contact_email' => $admin->email,
                 ]
             );
         }

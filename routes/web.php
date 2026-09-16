@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     Route::get('/team', [TeamController::class, 'index'])->name('team.index');
     Route::patch('/team/{user}/role', [TeamController::class, 'update'])->name('team.role.update');
+    Route::delete('/team/{user}', [TeamController::class, 'destroy'])->name('team.destroy');
     Route::post('/team/invitations', [TeamInvitationController::class, 'store'])
         ->middleware('throttle:10,1')
         ->name('team.invitations.store');

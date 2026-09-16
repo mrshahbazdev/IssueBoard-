@@ -15,10 +15,13 @@ class TeamController extends Controller
     {
         abort_unless($request->user()->canManageTeam(), 403);
 
+        $adminId = $request->user()->id;
+
         return view('team.index', [
-            'users' => User::orderBy('name')->get(),
+            'users' => $request->user()->teamMembers()->orderBy('name')->get(),
             'roles' => UserRole::cases(),
             'invitations' => TeamInvitation::query()
+                ->where('invited_by', $adminId)
                 ->whereNull('accepted_at')
                 ->latest()
                 ->get(),
@@ -32,6 +35,9 @@ class TeamController extends Controller
         if ($request->user()->is($user)) {
             return back()->withErrors(['role' => __('app.team.cannot_change_own_role')]);
         }
+
+        // Verify the user belongs to this admin's team
+        abort_unless($user->invited_by === $request->user()->id, 403);
 
         $data = $request->validate([
             'role' => ['required', 'string', 'in:'.implode(',', array_column(UserRole::cases(), 'value'))],

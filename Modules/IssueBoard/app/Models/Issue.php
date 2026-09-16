@@ -20,7 +20,7 @@ class Issue extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'project_id', 'title', 'description', 'suggested_solution',
+        'project_id', 'team_owner_id', 'title', 'description', 'suggested_solution',
         'status', 'priority', 'position', 'created_by', 'assigned_to',
         'contact_name', 'contact_email', 'contact_phone', 'due_date',
     ];
@@ -37,6 +37,12 @@ class Issue extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (Issue $issue) {
+            if (! $issue->team_owner_id && auth()->check() && method_exists(auth()->user(), 'teamOwnerId')) {
+                $issue->team_owner_id = auth()->user()->teamOwnerId();
+            }
+        });
+
         static::deleting(function (Issue $issue) {
             if ($issue->isForceDeleting()) {
                 $issue->deleteAttachments();
@@ -119,13 +125,16 @@ class Issue extends Model
 
     public function scopeVisibleTo(Builder $query, Model $user): Builder
     {
-        $role = $user->role instanceof UserRole ? $user->role : UserRole::tryFrom($user->role);
+        $ownerId = method_exists($user, 'teamOwnerId') ? $user->teamOwnerId() : null;
 
-        if (in_array($role, [UserRole::Admin, UserRole::Manager], true)) {
-            return $query;
-        }
+        return $query->where(function (Builder $q) use ($user, $ownerId) {
+            if ($ownerId) {
+                $q->where('team_owner_id', $ownerId);
+            }
 
-        return $query->where('assigned_to', $user->getKey());
+            $q->orWhere('assigned_to', $user->getKey())
+              ->orWhere('created_by', $user->getKey());
+        });
     }
 
     // ----------------------------------------------------------------- actions
@@ -183,10 +192,14 @@ class Issue extends Model
 
     public function isVisibleTo(Model $user): bool
     {
-        $role = $user->role instanceof UserRole ? $user->role : UserRole::tryFrom($user->role);
+        $ownerId = method_exists($user, 'teamOwnerId') ? $user->teamOwnerId() : null;
 
-        return in_array($role, [UserRole::Admin, UserRole::Manager], true)
-            || $this->assigned_to === $user->getKey();
+        if ($ownerId && $this->team_owner_id && (int) $this->team_owner_id === (int) $ownerId) {
+            return true;
+        }
+
+        return $this->assigned_to === $user->getKey()
+            || $this->created_by === $user->getKey();
     }
 
     public function getPriorityLabelAttribute(): string

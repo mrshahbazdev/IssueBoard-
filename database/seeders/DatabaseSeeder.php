@@ -19,25 +19,35 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = collect([
-            ['name' => 'Workspace Admin', 'email' => 'admin@issueboard.test', 'role' => UserRole::Admin],
-            ['name' => 'Project Manager', 'email' => 'manager@issueboard.test', 'role' => UserRole::Manager],
-            ['name' => 'Development Team', 'email' => 'developer@issueboard.test', 'role' => UserRole::Developer],
-            ['name' => 'Team Member', 'email' => 'member@issueboard.test', 'role' => UserRole::Member],
-            ['name' => 'Read-only Viewer', 'email' => 'viewer@issueboard.test', 'role' => UserRole::Viewer],
-        ])->mapWithKeys(function (array $data) {
-            $user = User::updateOrCreate(
-                ['email' => $data['email']],
-                $data + ['password' => 'password', 'email_verified_at' => now()]
-            );
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@issueboard.test'],
+            [
+                'name' => 'Workspace Admin',
+                'role' => UserRole::Admin,
+                'invited_by' => null,
+                'password' => 'password',
+                'email_verified_at' => now(),
+            ]
+        );
 
-            return [$data['role']->value => $user];
+        $teamUsers = collect([
+            'manager' => ['name' => 'Project Manager', 'email' => 'manager@issueboard.test', 'role' => UserRole::Manager],
+            'developer' => ['name' => 'Development Team', 'email' => 'developer@issueboard.test', 'role' => UserRole::Developer],
+            'member' => ['name' => 'Team Member', 'email' => 'member@issueboard.test', 'role' => UserRole::Member],
+            'viewer' => ['name' => 'Read-only Viewer', 'email' => 'viewer@issueboard.test', 'role' => UserRole::Viewer],
+        ])->map(function (array $data) use ($admin) {
+            return User::updateOrCreate(
+                ['email' => $data['email']],
+                $data + ['password' => 'password', 'email_verified_at' => now(), 'invited_by' => $admin->id]
+            );
         });
 
+        $users = $teamUsers->put('admin', $admin);
+
         $projects = collect([
-            ['name' => 'Website', 'description' => 'Public website improvements and content.', 'color' => '#f97316'],
-            ['name' => 'Customer Portal', 'description' => 'Account and service experience.', 'color' => '#0891b2'],
-            ['name' => 'Operations', 'description' => 'Internal processes and tools.', 'color' => '#7c3aed'],
+            ['name' => 'Website', 'description' => 'Public website improvements and content.', 'color' => '#f97316', 'team_owner_id' => $admin->id],
+            ['name' => 'Customer Portal', 'description' => 'Account and service experience.', 'color' => '#0891b2', 'team_owner_id' => $admin->id],
+            ['name' => 'Operations', 'description' => 'Internal processes and tools.', 'color' => '#7c3aed', 'team_owner_id' => $admin->id],
         ])->map(fn (array $project) => Project::firstOrCreate(['name' => $project['name']], $project));
 
         $samples = [
@@ -48,6 +58,7 @@ class DatabaseSeeder extends Seeder
                 'status' => IssueStatus::New,
                 'priority' => 1,
                 'project_id' => $projects[0]->id,
+                'team_owner_id' => $admin->id,
                 'assigned_to' => $users['manager']->id,
             ],
             [
@@ -57,6 +68,7 @@ class DatabaseSeeder extends Seeder
                 'status' => IssueStatus::Review,
                 'priority' => 2,
                 'project_id' => $projects[1]->id,
+                'team_owner_id' => $admin->id,
                 'assigned_to' => $users['manager']->id,
             ],
             [
@@ -66,6 +78,7 @@ class DatabaseSeeder extends Seeder
                 'status' => IssueStatus::InProgress,
                 'priority' => 2,
                 'project_id' => $projects[1]->id,
+                'team_owner_id' => $admin->id,
                 'assigned_to' => $users['developer']->id,
             ],
             [
@@ -74,6 +87,7 @@ class DatabaseSeeder extends Seeder
                 'status' => IssueStatus::Done,
                 'priority' => 3,
                 'project_id' => $projects[2]->id,
+                'team_owner_id' => $admin->id,
                 'assigned_to' => $users['member']->id,
                 'closed_at' => now(),
             ],

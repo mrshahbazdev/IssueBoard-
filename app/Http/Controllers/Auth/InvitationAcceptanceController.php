@@ -62,6 +62,7 @@ class InvitationAcceptanceController extends Controller
                 ...$data,
                 'email' => $invitation->email,
                 'role' => $invitation->role,
+                'invited_by' => $invitation->invited_by,
             ]);
 
             $invitation->update(['accepted_at' => now()]);

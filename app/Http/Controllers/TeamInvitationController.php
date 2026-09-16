@@ -56,6 +56,7 @@ class TeamInvitationController extends Controller
     {
         $this->authorizeTeamManagement($request);
         abort_if($invitation->accepted_at, 404);
+        abort_unless($invitation->invited_by === $request->user()->getKey(), 403);
 
         if (! $request->user()->mailSetting()->exists()) {
             return back()->withErrors(['email' => __('app.team.smtp_required')]);
@@ -80,6 +81,7 @@ class TeamInvitationController extends Controller
     {
         $this->authorizeTeamManagement($request);
         abort_if($invitation->accepted_at, 404);
+        abort_unless($invitation->invited_by === $request->user()->getKey(), 403);
 
         $email = $invitation->email;
         $invitation->delete();

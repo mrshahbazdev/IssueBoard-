@@ -188,10 +188,19 @@ class IssueForm extends Component
     {
         $userModel = config('issueboard.user_model');
         $projectModel = config('issueboard.project_model');
+        $currentUser = auth()->user();
+
+        $users = $currentUser && method_exists($currentUser, 'teamMembers')
+            ? $currentUser->teamMembers()->where('role', '!=', 'viewer')->orderBy('name')->get(['id', 'name'])
+            : $userModel::where('role', '!=', 'viewer')->orderBy('name')->get(['id', 'name']);
+
+        $projects = class_exists($projectModel)
+            ? $projectModel::query()->visibleTo($currentUser)->orderBy('name')->get(['id', 'name'])
+            : collect();
 
         return view('issueboard::form', [
-            'users' => $userModel::where('role', '!=', 'viewer')->orderBy('name')->get(['id', 'name']),
-            'projects' => class_exists($projectModel) ? $projectModel::orderBy('name')->get(['id', 'name']) : collect(),
+            'users' => $users,
+            'projects' => $projects,
         ])->layout('issueboard::layouts.master');
     }
 }

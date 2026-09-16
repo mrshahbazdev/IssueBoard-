@@ -25,6 +25,7 @@ class User extends Authenticatable
         'phone',
         'role',
         'password',
+        'invited_by',
     ];
 
     /**
@@ -54,6 +55,31 @@ class User extends Authenticatable
     public function canManageTeam(): bool
     {
         return $this->role === UserRole::Admin;
+    }
+
+    public function inviter(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(self::class, 'invited_by');
+    }
+
+    public function invitedUsers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(self::class, 'invited_by');
+    }
+
+    public function teamOwnerId(): int
+    {
+        return $this->invited_by ?? $this->getKey();
+    }
+
+    public function teamMembers(): \Illuminate\Database\Eloquent\Builder
+    {
+        $ownerId = $this->teamOwnerId();
+
+        return static::query()->where(function ($query) use ($ownerId) {
+            $query->where('id', $ownerId)
+                ->orWhere('invited_by', $ownerId);
+        });
     }
 
     public function mailSetting(): HasOne

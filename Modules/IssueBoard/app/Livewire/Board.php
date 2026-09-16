@@ -87,7 +87,7 @@ class Board extends Component
         return view('issueboard::board', [
             'statuses' => IssueStatus::cases(),
             'issues' => $issues,
-            'projects' => class_exists($projectModel) ? $projectModel::orderBy('name')->get(['id', 'name']) : collect(),
+            'projects' => class_exists($projectModel) ? $projectModel::query()->visibleTo(auth()->user())->orderBy('name')->get(['id', 'name']) : collect(),
             'hasFilters' => filled($this->search) || filled($this->projectId) || $this->onlyMine,
         ])->layout('issueboard::layouts.master');
     }

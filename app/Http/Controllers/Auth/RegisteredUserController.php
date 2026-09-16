@@ -18,23 +18,11 @@ class RegisteredUserController extends Controller
 {
     public function create(): View|RedirectResponse
     {
-        if (User::query()->exists()) {
-            return redirect()
-                ->route('login')
-                ->with('status', __('app.register.closed'));
-        }
-
         return view('auth.register');
     }
 
     public function store(Request $request): RedirectResponse
     {
-        if (User::query()->exists()) {
-            return redirect()
-                ->route('login')
-                ->with('status', __('app.register.closed'));
-        }
-
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
@@ -42,15 +30,10 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ]);
 
-        $user = DB::transaction(function () use ($data): User {
-            if (User::query()->lockForUpdate()->first()) {
-                throw ValidationException::withMessages([
-                    'email' => __('app.register.closed'),
-                ]);
-            }
-
-            return User::create($data + ['role' => UserRole::Admin]);
-        });
+        $user = User::create($data + [
+            'role' => UserRole::Admin,
+            'invited_by' => null,
+        ]);
 
         event(new Registered($user));
         Auth::login($user);

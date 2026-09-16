@@ -17,7 +17,7 @@ class AuthenticatedSessionController extends Controller
     public function create(): View
     {
         return view('auth.login', [
-            'registrationOpen' => User::query()->doesntExist(),
+            'registrationOpen' => true,
         ]);
     }
 

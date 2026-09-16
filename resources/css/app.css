@@ -4,7 +4,14 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
-@source '../../Modules/IssueBoard/resources/views/**/*.blade.php';
+@source '../views';
+@source '../../Modules';
+@source '../../Modules/**/*.blade.php';
+@source '../../Modules/**/*.php';
+@source './Modules';
+@source '../Modules';
+@source 'Modules';
+@source '../../app';
 
 @theme {
     --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',

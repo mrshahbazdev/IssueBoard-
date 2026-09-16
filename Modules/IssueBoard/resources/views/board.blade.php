@@ -248,7 +248,8 @@
             </div>
 
             <!-- Calendar Days Header -->
-            <div class="grid grid-cols-7 border-b border-slate-200/80 bg-slate-100/70 text-center text-xs font-extrabold uppercase tracking-wider text-slate-500">
+            <div class="grid grid-cols-7 border-b border-slate-200/80 bg-slate-100/70 text-center text-xs font-extrabold uppercase tracking-wider text-slate-500"
+                 style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));">
                 @foreach ($weekDays as $idx => $day)
                     <div class="py-3 px-2 {{ $idx >= 5 ? 'text-slate-400 bg-slate-100' : '' }}">
                         <span class="hidden md:inline">{{ $day['full'] }}</span>
@@ -258,12 +259,14 @@
             </div>
 
             <!-- Calendar Grid -->
-            <div class="grid grid-cols-7 divide-x divide-y divide-slate-200/80 bg-slate-200/50">
+            <div class="grid grid-cols-7 divide-x divide-y divide-slate-200/80 bg-slate-200/50"
+                 style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));">
                 @foreach ($calendarDays as $dayIndex => $dayInfo)
                     @php
                         $isWeekend = in_array($dayInfo['date']->dayOfWeekIso, [6, 7], true);
                     @endphp
-                    <div class="min-h-[145px] sm:min-h-[165px] p-2 sm:p-2.5 flex flex-col justify-between transition-colors {{ ! $dayInfo['isCurrentMonth'] ? 'bg-slate-50/70 text-slate-400' : ($isWeekend ? 'bg-slate-50/40' : 'bg-white hover:bg-orange-50/10') }}">
+                    <div class="min-h-[145px] sm:min-h-[165px] p-2 sm:p-2.5 flex flex-col justify-between transition-colors {{ ! $dayInfo['isCurrentMonth'] ? 'bg-slate-50/70 text-slate-400' : ($isWeekend ? 'bg-slate-50/40' : 'bg-white hover:bg-orange-50/10') }}"
+                         style="min-height: 145px;">
                         <!-- Top Cell Header: Date Number & Count -->
                         <div class="flex items-center justify-between">
                             @if ($dayInfo['isToday'])

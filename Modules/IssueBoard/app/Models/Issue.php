@@ -130,7 +130,7 @@ class Issue extends Model
     public function scopeForProject(Builder $query, ?int $projectId): Builder
     {
         return $projectId
-            ? $query->where(fn ($q) => $q->where('project_id', $projectId)->orWhereNull('project_id'))
+            ? $query->where('project_id', $projectId)
             : $query;
     }
 

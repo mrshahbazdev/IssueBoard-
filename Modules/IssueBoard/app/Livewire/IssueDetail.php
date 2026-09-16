@@ -311,12 +311,22 @@ class IssueDetail extends Component
         $activities = $this->issue->activities()->with('user')->latest()->take(20)->get();
 
         return view('issueboard::detail', [
+            'issue' => $this->issue,
             'statuses' => IssueStatus::cases(),
             'comments' => $comments,
             'openQuestionCount' => $comments->filter->is_open_question->count(),
             'history' => $this->issue->statusLogs()->with('user')->limit(10)->get(),
             'availableLabels' => $availableLabels,
             'activities' => $activities,
+            'body' => $this->body,
+            'isQuestion' => $this->isQuestion,
+            'replyTo' => $this->replyTo,
+            'commentFiles' => $this->commentFiles,
+            'newChecklistTitle' => $this->newChecklistTitle,
+            'newLabelName' => $this->newLabelName,
+            'newLabelColor' => $this->newLabelColor,
+            'timeToLog' => $this->timeToLog,
+            'newEstimate' => $this->newEstimate,
         ])->layout('issueboard::layouts.master');
     }
 }

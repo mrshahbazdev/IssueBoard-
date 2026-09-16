@@ -253,7 +253,9 @@
 
                 <ul class="mt-6 space-y-4">
                     @forelse ($comments as $comment)
-                        @php($commentInitial = mb_strtoupper(mb_substr($comment->user->name, 0, 1)))
+                        @php
+                            $commentInitial = mb_strtoupper(mb_substr($comment->user?->name ?? 'User', 0, 1));
+                        @endphp
                         <li wire:key="comment-{{ $comment->id }}"
                             @class([
                                 'rounded-2xl border p-4 sm:p-5',

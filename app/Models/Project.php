@@ -11,7 +11,7 @@ class Project extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'color', 'team_owner_id'];
+    protected $fillable = ['name', 'description', 'color', 'team_owner_id', 'created_by'];
 
     public function issues(): HasMany
     {
@@ -23,6 +23,21 @@ class Project extends Model
         return $this->belongsTo(User::class, 'team_owner_id');
     }
 
+    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function isManagedBy(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return (int) $this->team_owner_id === (int) $user->teamOwnerId()
+            || (int) $this->created_by === (int) $user->getKey();
+    }
+
     public function scopeVisibleTo(\Illuminate\Database\Eloquent\Builder $query, ?User $user): \Illuminate\Database\Eloquent\Builder
     {
         if (! $user) {
@@ -31,9 +46,9 @@ class Project extends Model
 
         $ownerId = $user->teamOwnerId();
 
-        return $query->where(function ($q) use ($ownerId) {
+        return $query->where(function ($q) use ($user, $ownerId) {
             $q->where('team_owner_id', $ownerId)
-                ->orWhereNull('team_owner_id');
+              ->orWhere('created_by', $user->getKey());
         });
     }
 }

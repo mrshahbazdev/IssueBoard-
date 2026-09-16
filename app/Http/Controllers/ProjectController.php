@@ -40,6 +40,7 @@ class ProjectController extends Controller
             'description' => $data['description'] ?? null,
             'color' => $data['color'] ?? '#0f766e',
             'team_owner_id' => $request->user()->teamOwnerId(),
+            'created_by' => $request->user()->id,
         ]);
 
         return back()->with('status', __('app.projects.created', ['name' => $project->name]));
@@ -48,7 +49,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project): RedirectResponse
     {
         abort_unless($request->user()->canManageTeam(), 403);
-        abort_unless((int) $project->team_owner_id === (int) $request->user()->teamOwnerId() || is_null($project->team_owner_id), 403);
+        abort_unless($project->isManagedBy($request->user()), 403);
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -68,7 +69,7 @@ class ProjectController extends Controller
     public function destroy(Request $request, Project $project): RedirectResponse
     {
         abort_unless($request->user()->canManageTeam(), 403);
-        abort_unless((int) $project->team_owner_id === (int) $request->user()->teamOwnerId() || is_null($project->team_owner_id), 403);
+        abort_unless($project->isManagedBy($request->user()), 403);
 
         $name = $project->name;
         $project->issues()->update(['project_id' => null]);

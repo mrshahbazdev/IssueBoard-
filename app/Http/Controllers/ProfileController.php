@@ -73,6 +73,28 @@ class ProfileController extends Controller
     public function testSmtp(Request $request, UserSmtpMailer $smtpMailer): RedirectResponse
     {
         $user = $request->user()->load('mailSetting');
+        $setting = $user->mailSetting;
+
+        // If credentials are submitted with the test request, validate and save them first
+        if ($request->filled('host')) {
+            $data = $request->validateWithBag('smtpUpdate', [
+                'host' => ['required', 'string', 'max:255', 'not_regex:/[\\s\\/]/'],
+                'port' => ['required', 'integer', 'between:1,65535'],
+                'scheme' => ['required', Rule::in(['smtp', 'smtps'])],
+                'username' => ['nullable', 'string', 'max:255'],
+                'password' => [Rule::requiredIf(! $setting), 'nullable', 'string', 'max:1000'],
+                'from_address' => ['required', 'email', 'max:255'],
+                'from_name' => ['nullable', 'string', 'max:255'],
+            ]);
+
+            if (blank($data['password'])) {
+                unset($data['password']);
+            }
+
+            $user->mailSetting()->updateOrCreate([], $data);
+            $user->load('mailSetting');
+        }
+
         $mailer = $smtpMailer->mailerFor($user);
 
         if (! $mailer) {
@@ -82,11 +104,16 @@ class ProfileController extends Controller
             );
         }
 
+        $toEmail = $request->input('test_email', $user->email);
+        if (! filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+            $toEmail = $user->email;
+        }
+
         try {
             Mail::mailer($mailer)->raw(
                 __('app.profile.smtp_test_body'),
                 fn ($message) => $message
-                    ->to($user->email)
+                    ->to($toEmail)
                     ->from(
                         $user->mailSetting->from_address,
                         $user->mailSetting->from_name ?: $user->name
@@ -97,15 +124,16 @@ class ProfileController extends Controller
             Log::warning('User SMTP test failed.', [
                 'user_id' => $user->getKey(),
                 'exception' => $exception::class,
+                'message' => $exception->getMessage(),
             ]);
 
             return back()->withErrors(
-                ['smtp' => __('app.profile.smtp_test_failed')],
+                ['smtp' => __('app.profile.smtp_test_failed') . ' (' . $exception->getMessage() . ')'],
                 'smtpUpdate'
             );
         }
 
-        return back()->with('status', __('app.profile.smtp_test_sent', ['email' => $user->email]));
+        return back()->with('status', __('app.profile.smtp_test_sent', ['email' => $toEmail]));
     }
 
     public function destroySmtp(Request $request): RedirectResponse

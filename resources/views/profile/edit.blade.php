@@ -159,20 +159,38 @@
                         </div>
                     </div>
 
-                    <button @disabled(! $smtpRoutesAvailable) class="mt-6 rounded-xl bg-cyan-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_save') }}</button>
+                    <div class="mt-6 flex flex-wrap items-center gap-3">
+                        <button type="submit" @disabled(! $smtpRoutesAvailable) class="rounded-xl bg-cyan-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_save') }}</button>
+                        <button type="submit" formaction="{{ route('profile.smtp.test') }}" @disabled(! $smtpRoutesAvailable) class="rounded-xl border border-cyan-500 bg-cyan-50 px-5 py-3 text-sm font-extrabold text-cyan-800 transition hover:bg-cyan-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">
+                            {{ __('app.profile.smtp_save_and_test') }}
+                        </button>
+                    </div>
                 </form>
 
                 @if ($user->mailSetting)
-                    <div class="mt-4 flex flex-wrap gap-3 border-t border-slate-100 pt-4">
-                        <form method="POST" action="{{ $smtpRoutesAvailable ? route('profile.smtp.test') : '#' }}">
+                    <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900">{{ __('app.profile.smtp_test_heading') }}</h3>
+                            <p class="mt-1 text-xs text-slate-500">{{ __('app.profile.smtp_test_desc') }}</p>
+                        </div>
+                        <form method="POST" action="{{ $smtpRoutesAvailable ? route('profile.smtp.test') : '#' }}" class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
                             @csrf
-                            <button @disabled(! $smtpRoutesAvailable) class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-extrabold text-slate-700 transition hover:border-cyan-400 hover:text-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_test') }}</button>
+                            <div class="flex-1">
+                                <input type="email" name="test_email" value="{{ old('test_email', $user->email) }}" required placeholder="recipient@example.com"
+                                       class="w-full rounded-xl border-slate-300 bg-white px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-cyan-500">
+                            </div>
+                            <button type="submit" @disabled(! $smtpRoutesAvailable) class="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-extrabold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-50">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>
+                                {{ __('app.profile.smtp_test') }}
+                            </button>
                         </form>
-                        <form method="POST" action="{{ $smtpRoutesAvailable ? route('profile.smtp.destroy') : '#' }}">
-                            @csrf
-                            @method('DELETE')
-                            <button @disabled(! $smtpRoutesAvailable) class="rounded-xl px-4 py-2.5 text-xs font-extrabold text-rose-600 transition hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_remove') }}</button>
-                        </form>
+                        <div class="mt-4 border-t border-slate-200 pt-3">
+                            <form method="POST" action="{{ $smtpRoutesAvailable ? route('profile.smtp.destroy') : '#' }}" onsubmit="return confirm('{{ __('app.profile.smtp_remove') }}?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" @disabled(! $smtpRoutesAvailable) class="text-xs font-extrabold text-rose-600 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_remove') }}</button>
+                            </form>
+                        </div>
                     </div>
                 @endif
             </div>

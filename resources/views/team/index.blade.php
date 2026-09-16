@@ -21,10 +21,24 @@
                     <h2 class="mt-4 text-2xl font-extrabold tracking-tight">{{ __('app.team.invite_heading') }}</h2>
                     <p class="mt-2 max-w-md text-sm leading-6 text-slate-300">{{ __('app.team.invite_description') }}</p>
                     @if (auth()->user()->mailSetting()->exists())
-                        <p class="mt-3 inline-flex items-center gap-2 text-xs font-bold text-cyan-300">
-                            <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
-                            {{ __('app.team.smtp_connected') }}
-                        </p>
+                        <div class="mt-3 flex flex-wrap items-center gap-3">
+                            <p class="inline-flex items-center gap-2 text-xs font-bold text-cyan-300">
+                                <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
+                                {{ __('app.team.smtp_connected') }}
+                            </p>
+                            @if ($smtpRoutesAvailable ?? Route::has('profile.smtp.test'))
+                                <form method="POST" action="{{ route('profile.smtp.test') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/40 bg-cyan-400/10 px-2.5 py-1 text-xs font-bold text-cyan-200 transition hover:bg-cyan-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400">
+                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>
+                                        {{ __('app.profile.smtp_test') }}
+                                    </button>
+                                </form>
+                            @endif
+                            <a href="{{ route('profile.edit') }}#smtp" class="text-xs font-semibold text-slate-400 underline decoration-slate-400/40 underline-offset-4 hover:text-white">
+                                {{ __('app.navigation.profile') }}
+                            </a>
+                        </div>
                     @else
                         <a href="{{ route('profile.edit') }}#smtp" class="mt-3 inline-flex items-center gap-2 text-xs font-bold text-orange-300 underline decoration-orange-300/40 underline-offset-4 hover:text-orange-200">
                             {{ __('app.team.smtp_setup') }}

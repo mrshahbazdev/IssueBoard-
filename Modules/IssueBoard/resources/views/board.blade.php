@@ -80,17 +80,29 @@
                            class="w-full rounded-xl border-slate-300 bg-slate-50 py-2.5 pl-10 pr-3 text-sm placeholder:text-slate-400 focus:border-[#ff9200] focus:bg-white focus:ring-[#ff9200]">
                 </label>
 
-                @if ($projects->isNotEmpty())
-                    <label>
-                        <span class="sr-only">{{ __('issueboard::issueboard.all_projects') }}</span>
-                        <select wire:model.live="projectId"
-                                class="w-full rounded-xl border-slate-300 bg-slate-50 py-2.5 text-sm focus:border-[#ff9200] focus:bg-white focus:ring-[#ff9200] sm:w-auto sm:min-w-48">
-                            <option value="">{{ __('issueboard::issueboard.all_projects') }}</option>
-                            @foreach ($projects as $project)
-                                <option value="{{ $project->id }}">{{ $project->name }}</option>
-                            @endforeach
-                        </select>
-                    </label>
+                @if ($projects->isNotEmpty() || auth()->user()->canManageTeam())
+                    <div class="flex items-center gap-1.5">
+                        @if ($projects->isNotEmpty())
+                            <label>
+                                <span class="sr-only">{{ __('issueboard::issueboard.all_projects') }}</span>
+                                <select wire:model.live="projectId"
+                                        class="w-full rounded-xl border-slate-300 bg-slate-50 py-2.5 text-sm focus:border-[#ff9200] focus:bg-white focus:ring-[#ff9200] sm:w-auto sm:min-w-48">
+                                    <option value="">{{ __('issueboard::issueboard.all_projects') }}</option>
+                                    @foreach ($projects as $project)
+                                        <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                        @endif
+                        @if (auth()->user()->canManageTeam())
+                            <a href="{{ route('projects.index') }}" title="{{ __('app.projects.heading') }}" class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+                                <svg class="h-4 w-4 sm:mr-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                <span class="hidden sm:inline">{{ __('app.projects.new_project') }}</span>
+                            </a>
+                        @endif
+                    </div>
                 @endif
 
                 <label class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-600">

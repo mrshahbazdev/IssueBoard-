@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\InvitationAcceptanceController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:5,1')
         ->name('profile.smtp.test');
     Route::delete('/profile/smtp', [ProfileController::class, 'destroySmtp'])->name('profile.smtp.destroy');
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     Route::get('/team', [TeamController::class, 'index'])->name('team.index');
     Route::patch('/team/{user}/role', [TeamController::class, 'update'])->name('team.role.update');
     Route::post('/team/invitations', [TeamInvitationController::class, 'store'])

@@ -53,9 +53,16 @@
                     </div>
 
                     <div>
-                        <label for="project" class="block text-sm font-semibold text-slate-700">
-                            {{ __('issueboard::issueboard.fields.project') }}
-                        </label>
+                        <div class="flex items-center justify-between">
+                            <label for="project" class="block text-sm font-semibold text-slate-700">
+                                {{ __('issueboard::issueboard.fields.project') }}
+                            </label>
+                            @if (auth()->user()->canManageTeam())
+                                <a href="{{ route('projects.index') }}" target="_blank" class="text-xs font-semibold text-orange-600 hover:text-orange-700">
+                                    + {{ __('app.projects.new_project') }}
+                                </a>
+                            @endif
+                        </div>
                         <select id="project" wire:model="project_id"
                                 class="mt-2 w-full rounded-xl border-slate-300 bg-slate-50 text-sm focus:border-[#ff9200] focus:bg-white focus:ring-[#ff9200]">
                             <option value="">{{ __('issueboard::issueboard.all_projects') }}</option>

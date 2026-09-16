@@ -27,5 +27,13 @@ class AppServiceProvider extends ServiceProvider
                 \Illuminate\Support\Facades\Route::delete('/projects/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');
             });
         }
+
+        if (class_exists(\App\Http\Controllers\ProfileController::class)) {
+            \Illuminate\Support\Facades\Route::middleware(['web', 'auth'])->group(function () {
+                \Illuminate\Support\Facades\Route::match(['post', 'put'], '/profile/smtp/test', [\App\Http\Controllers\ProfileController::class, 'testSmtp'])
+                    ->middleware('throttle:5,1')
+                    ->name('profile.smtp.test');
+            });
+        }
     }
 }

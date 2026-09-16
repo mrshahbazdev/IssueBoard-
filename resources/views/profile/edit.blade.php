@@ -160,8 +160,8 @@
                     </div>
 
                     <div class="mt-6 flex flex-wrap items-center gap-3">
-                        <button type="submit" @disabled(! $smtpRoutesAvailable) class="rounded-xl bg-cyan-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_save') }}</button>
-                        <button type="submit" formaction="{{ route('profile.smtp.test') }}" @disabled(! $smtpRoutesAvailable) class="rounded-xl border border-cyan-500 bg-cyan-50 px-5 py-3 text-sm font-extrabold text-cyan-800 transition hover:bg-cyan-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">
+                        <button type="submit" onclick="if (this.form.querySelector('input[name=_method]')) this.form.querySelector('input[name=_method]').value = 'PUT';" @disabled(! $smtpRoutesAvailable) class="rounded-xl bg-cyan-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">{{ __('app.profile.smtp_save') }}</button>
+                        <button type="submit" formaction="{{ route('profile.smtp.test') }}" onclick="if (this.form.querySelector('input[name=_method]')) this.form.querySelector('input[name=_method]').value = 'POST';" @disabled(! $smtpRoutesAvailable) class="rounded-xl border border-cyan-500 bg-cyan-50 px-5 py-3 text-sm font-extrabold text-cyan-800 transition hover:bg-cyan-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-50">
                             {{ __('app.profile.smtp_save_and_test') }}
                         </button>
                     </div>

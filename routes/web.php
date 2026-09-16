@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::put('/profile/smtp', [ProfileController::class, 'updateSmtp'])->name('profile.smtp');
-    Route::post('/profile/smtp/test', [ProfileController::class, 'testSmtp'])
+    Route::match(['post', 'put'], '/profile/smtp/test', [ProfileController::class, 'testSmtp'])
         ->middleware('throttle:5,1')
         ->name('profile.smtp.test');
     Route::delete('/profile/smtp', [ProfileController::class, 'destroySmtp'])->name('profile.smtp.destroy');

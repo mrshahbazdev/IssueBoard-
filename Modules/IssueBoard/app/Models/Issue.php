@@ -23,6 +23,7 @@ class Issue extends Model
         'project_id', 'team_owner_id', 'title', 'description', 'suggested_solution',
         'status', 'priority', 'position', 'created_by', 'assigned_to',
         'contact_name', 'contact_email', 'contact_phone', 'due_date',
+        'estimated_hours', 'spent_hours',
     ];
 
     protected function casts(): array
@@ -32,6 +33,8 @@ class Issue extends Model
             'due_date' => 'date',
             'closed_at' => 'datetime',
             'priority' => 'integer',
+            'estimated_hours' => 'decimal:2',
+            'spent_hours' => 'decimal:2',
         ];
     }
 
@@ -70,6 +73,36 @@ class Issue extends Model
     public function statusLogs(): HasMany
     {
         return $this->hasMany(IssueStatusLog::class)->latest();
+    }
+
+    public function labels(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Label::class, 'issue_label');
+    }
+
+    public function checklistItems(): HasMany
+    {
+        return $this->hasMany(IssueChecklistItem::class)->orderBy('position')->oldest('id');
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(IssueActivity::class)->latest();
+    }
+
+    public function getChecklistProgressAttribute(): array
+    {
+        $total = $this->checklistItems->count();
+        if ($total === 0) {
+            return ['total' => 0, 'completed' => 0, 'percentage' => 0];
+        }
+        $completed = $this->checklistItems->where('is_completed', true)->count();
+
+        return [
+            'total' => $total,
+            'completed' => $completed,
+            'percentage' => (int) round(($completed / $total) * 100),
+        ];
     }
 
     public function author(): BelongsTo
@@ -157,6 +190,15 @@ class Issue extends Model
             'to_status' => $to->value,
             'user_id' => $user->getKey(),
         ]);
+
+        IssueActivity::log(
+            $this,
+            'status_changed',
+            "Status changed from {$from->label()} to {$to->label()}",
+            $from->value,
+            $to->value,
+            $user->getKey()
+        );
 
         if ($notify) {
             $recipients = $this->watchers()->reject(fn ($w) => $w->getKey() === $user->getKey());

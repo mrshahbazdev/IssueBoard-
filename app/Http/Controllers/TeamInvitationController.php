@@ -30,12 +30,13 @@ class TeamInvitationController extends Controller
 
         $email = Str::lower(trim($data['email']));
 
-        if (User::whereRaw('LOWER(email) = ?', [$email])->exists()) {
-            return back()->withErrors(['email' => __('app.team.invite_existing_user')])->withInput();
+        if ($email === Str::lower(trim($request->user()->email))) {
+            return back()->withErrors(['email' => __('app.team.cannot_invite_self')])->withInput();
         }
 
         TeamInvitation::query()
             ->whereRaw('LOWER(email) = ?', [$email])
+            ->where('invited_by', $request->user()->getKey())
             ->whereNull('accepted_at')
             ->delete();
 

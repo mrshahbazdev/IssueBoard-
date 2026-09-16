@@ -20,12 +20,15 @@ class InvitationAcceptanceController extends Controller
     {
         $invitation = $this->findInvitation($token);
 
-        if (! $invitation || $this->userExists($invitation->email)) {
+        if (! $invitation) {
             return response()->view('auth.invitation-invalid', status: 410);
         }
 
+        $existingUser = User::whereRaw('LOWER(email) = ?', [mb_strtolower($invitation->email)])->first();
+
         return view('auth.accept-invitation', [
             'invitation' => $invitation,
+            'existingUser' => $existingUser,
             'token' => $token,
         ]);
     }
@@ -34,8 +37,36 @@ class InvitationAcceptanceController extends Controller
     {
         $invitation = $this->findInvitation($token);
 
-        if (! $invitation || $this->userExists($invitation->email)) {
+        if (! $invitation) {
             return response()->view('auth.invitation-invalid', status: 410);
+        }
+
+        $existingUser = User::whereRaw('LOWER(email) = ?', [mb_strtolower($invitation->email)])->first();
+
+        if ($existingUser) {
+            if (Auth::check() && Auth::id() === $existingUser->id) {
+                // User is already logged in as the invited account
+            } else {
+                $credentials = $request->validate([
+                    'password' => ['required', 'string'],
+                ]);
+
+                if (! Auth::attempt(['email' => $existingUser->email, 'password' => $credentials['password']])) {
+                    return back()->withErrors(['password' => __('app.login.invalid_credentials')])->withInput();
+                }
+            }
+
+            // Update user to join this team
+            $existingUser->update([
+                'invited_by' => $invitation->invited_by,
+                'role' => $invitation->role,
+            ]);
+
+            $invitation->update(['accepted_at' => now()]);
+            $request->session()->regenerate();
+
+            return redirect()->route('issueboard.index')
+                ->with('status', __('app.invitation.team_joined', ['team' => $invitation->inviter?->name ?? 'workspace']));
         }
 
         $data = $request->validate([
@@ -53,8 +84,7 @@ class InvitationAcceptanceController extends Controller
             abort_if(
                 ! $invitation
                 || $invitation->accepted_at
-                || $invitation->expires_at->isPast()
-                || $this->userExists($invitation->email),
+                || $invitation->expires_at->isPast(),
                 410
             );
 
@@ -85,10 +115,5 @@ class InvitationAcceptanceController extends Controller
             ->whereNull('accepted_at')
             ->where('expires_at', '>', now())
             ->first();
-    }
-
-    private function userExists(string $email): bool
-    {
-        return User::whereRaw('LOWER(email) = ?', [mb_strtolower($email)])->exists();
     }
 }

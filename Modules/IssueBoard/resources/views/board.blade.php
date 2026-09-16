@@ -95,7 +95,7 @@
                             </label>
                         @endif
                         @if (auth()->user()->canManageTeam())
-                            <a href="{{ route('projects.index') }}" title="{{ __('app.projects.heading') }}" class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+                            <a href="{{ \Illuminate\Support\Facades\Route::has('projects.index') ? route('projects.index') : url('/projects') }}" title="{{ __('app.projects.heading') }}" class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
                                 <svg class="h-4 w-4 sm:mr-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>

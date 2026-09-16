@@ -58,7 +58,7 @@
                                 {{ __('issueboard::issueboard.fields.project') }}
                             </label>
                             @if (auth()->user()->canManageTeam())
-                                <a href="{{ route('projects.index') }}" target="_blank" class="text-xs font-semibold text-orange-600 hover:text-orange-700">
+                                <a href="{{ \Illuminate\Support\Facades\Route::has('projects.index') ? route('projects.index') : url('/projects') }}" target="_blank" class="text-xs font-semibold text-orange-600 hover:text-orange-700">
                                     + {{ __('app.projects.new_project') }}
                                 </a>
                             @endif

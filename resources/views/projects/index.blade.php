@@ -23,7 +23,7 @@
                     <h2 class="mt-3 text-2xl font-extrabold tracking-tight">{{ __('app.projects.create_heading') }}</h2>
                     <p class="mt-1 max-w-md text-sm text-slate-300">{{ __('app.projects.create_description') }}</p>
 
-                    <form method="POST" action="{{ route('projects.store') }}" class="mt-6 grid gap-4 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_130px_auto] sm:items-end">
+                    <form method="POST" action="{{ \Illuminate\Support\Facades\Route::has('projects.store') ? route('projects.store') : url('/projects') }}" class="mt-6 grid gap-4 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_130px_auto] sm:items-end">
                         @csrf
                         <div>
                             <label for="name" class="text-xs font-bold text-slate-300">{{ __('app.projects.name') }} <span class="text-rose-400">*</span></label>
@@ -108,7 +108,7 @@
                                                 <button type="button" @click="editingId = (editingId === {{ $project->id }} ? null : {{ $project->id }})" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-slate-50 transition">
                                                     {{ __('app.projects.update') }}
                                                 </button>
-                                                <form method="POST" action="{{ route('projects.destroy', $project) }}" onsubmit="return confirm('{{ __('app.projects.delete_confirm') }}')">
+                                                <form method="POST" action="{{ \Illuminate\Support\Facades\Route::has('projects.destroy') ? route('projects.destroy', $project) : url('/projects/' . $project->id) }}" onsubmit="return confirm('{{ __('app.projects.delete_confirm') }}')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="rounded-lg px-2.5 py-1.5 text-xs font-extrabold text-rose-600 hover:bg-rose-50 transition">
@@ -124,7 +124,7 @@
                                 @if ($canManage)
                                     <tr x-show="editingId === {{ $project->id }}" x-cloak class="bg-slate-50/75">
                                         <td colspan="4" class="px-5 py-4 border-t border-slate-200">
-                                            <form method="POST" action="{{ route('projects.update', $project) }}" class="flex flex-wrap items-center gap-3">
+                                            <form method="POST" action="{{ \Illuminate\Support\Facades\Route::has('projects.update') ? route('projects.update', $project) : url('/projects/' . $project->id) }}" class="flex flex-wrap items-center gap-3">
                                                 @csrf
                                                 @method('PUT')
                                                 <input type="text" name="name" value="{{ $project->name }}" required class="rounded-xl border-slate-300 bg-white px-3 py-2 text-xs font-semibold focus:border-orange-500 focus:ring-orange-500">

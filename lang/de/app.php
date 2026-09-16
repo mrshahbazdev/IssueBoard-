@@ -241,4 +241,21 @@ return [
         'issue_count' => '{0} 0 Aufgaben|{1} 1 Aufgabe|[2,*] :count Aufgaben',
         'no_projects' => 'Noch keine Projekte vorhanden. Legen Sie oben Ihr erstes Projekt an!',
     ],
+
+    'notifications' => [
+        'title' => 'Benachrichtigungen',
+        'heading' => 'Benachrichtigungen',
+        'new' => 'neu',
+        'mark_all_read' => 'Alle als gelesen markieren',
+        'empty' => 'Keine Benachrichtigungen vorhanden',
+    ],
+
+    'search' => [
+        'quick_search' => 'Schnellsuche...',
+        'placeholder' => 'Aufgaben, Projekte oder Teammitglieder suchen...',
+        'no_results' => 'Keine Ergebnisse gefunden für',
+        'issues' => 'Aufgaben',
+        'projects' => 'Projekte',
+        'team' => 'Teammitglieder',
+    ],
 ];

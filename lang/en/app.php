@@ -241,4 +241,21 @@ return [
         'issue_count' => '{0} 0 issues|{1} 1 issue|[2,*] :count issues',
         'no_projects' => 'No projects created yet. Add your first project above!',
     ],
+
+    'notifications' => [
+        'title' => 'Notifications',
+        'heading' => 'Notifications',
+        'new' => 'new',
+        'mark_all_read' => 'Mark all as read',
+        'empty' => 'No notifications yet',
+    ],
+
+    'search' => [
+        'quick_search' => 'Quick search...',
+        'placeholder' => 'Type to search issues, projects, or team members...',
+        'no_results' => 'No results found for',
+        'issues' => 'Issues',
+        'projects' => 'Projects',
+        'team' => 'Team Members',
+    ],
 ];

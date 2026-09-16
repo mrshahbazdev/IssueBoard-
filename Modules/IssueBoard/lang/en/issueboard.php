@@ -17,6 +17,13 @@ return [
     'form_intro' => 'Capture enough context so the next person can understand the issue and act without chasing information.',
     'starts_as_new' => 'Starts in New task',
     'all_projects' => 'All projects',
+    'all_priorities' => 'All Priorities',
+    'all_assignees' => 'All Assignees',
+    'all_labels' => 'All Labels',
+    'calendar' => 'Calendar',
+    'today' => 'Today',
+    'checklist' => 'Checklist / Subtasks',
+    'labels' => 'Labels / Tags',
     'project_help' => 'Leave this on all projects if the information affects the whole suite.',
     'optional' => '(optional)',
     'only_mine' => 'Assigned to me',
@@ -104,6 +111,7 @@ return [
         1 => 'High',
         2 => 'Normal',
         3 => 'Low',
+        4 => 'Urgent',
     ],
 
     'fields' => [

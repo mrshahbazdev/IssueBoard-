@@ -142,4 +142,65 @@ class ProfileController extends Controller
 
         return back()->with('status', __('app.profile.smtp_removed'));
     }
+
+    public function toggleTwoFactor(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $enable = ! $user->two_factor_enabled;
+
+        if ($enable) {
+            $recoveryCodes = [
+                \Illuminate\Support\Str::random(10),
+                \Illuminate\Support\Str::random(10),
+                \Illuminate\Support\Str::random(10),
+                \Illuminate\Support\Str::random(10),
+            ];
+
+            $user->update([
+                'two_factor_enabled' => true,
+                'two_factor_recovery_codes' => json_encode($recoveryCodes),
+            ]);
+
+            return back()->with('status', __('Two-Factor Authentication has been enabled. Save your emergency recovery codes: ') . implode(', ', $recoveryCodes));
+        }
+
+        $user->update([
+            'two_factor_enabled' => false,
+            'two_factor_code' => null,
+            'two_factor_expires_at' => null,
+            'two_factor_recovery_codes' => null,
+        ]);
+
+        return back()->with('status', __('Two-Factor Authentication has been disabled.'));
+    }
+
+    public function updateWorkspace(Request $request): RedirectResponse
+    {
+        abort_unless($request->user()->canManageTeam(), 403);
+
+        $data = $request->validate([
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'accent_color' => ['nullable', 'string', 'max:20', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'logo' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        $settings = \App\Models\WorkspaceSetting::firstOrNew(['team_owner_id' => $request->user()->teamOwnerId()]);
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('workspace', 'public');
+            $settings->logo_path = $path;
+        }
+
+        if (array_key_exists('company_name', $data)) {
+            $settings->company_name = $data['company_name'];
+        }
+
+        if (array_key_exists('accent_color', $data)) {
+            $settings->accent_color = $data['accent_color'];
+        }
+
+        $settings->save();
+
+        return back()->with('status', __('Workspace settings updated.'));
+    }
 }

@@ -195,5 +195,111 @@
                 @endif
             </div>
         </section>
+
+        <!-- Two-Factor Authentication (2FA) Section -->
+        <section id="two-factor" class="relative mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <span class="absolute inset-y-0 left-0 w-1.5 bg-orange-500"></span>
+            <div class="p-6 sm:p-7">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                        </span>
+                        <div>
+                            <h2 class="font-extrabold text-slate-950">{{ __('Two-Factor Authentication (Email OTP)') }}</h2>
+                            <p class="mt-1 text-xs text-slate-500">{{ __('Require a 6-digit security code sent to your email address each time you sign in.') }}</p>
+                        </div>
+                    </div>
+
+                    <span class="self-start rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide ring-1 ring-inset {{ $user->two_factor_enabled ? 'bg-emerald-50 text-emerald-700 ring-emerald-200' : 'bg-slate-100 text-slate-600 ring-slate-200' }}">
+                        {{ $user->two_factor_enabled ? __('Enabled') : __('Disabled') }}
+                    </span>
+                </div>
+
+                @if ($user->two_factor_enabled && $user->two_factor_recovery_codes)
+                    @php($codes = json_decode($user->two_factor_recovery_codes, true) ?: [])
+                    <div class="mt-5 rounded-xl border border-orange-200 bg-orange-50/70 p-4">
+                        <h4 class="text-xs font-bold text-orange-950">{{ __('Emergency Recovery Codes') }}</h4>
+                        <p class="mt-1 text-xs text-orange-900 leading-5">{{ __('Store these recovery codes in a secure password manager. If you lose access to your email, you can use one of these codes to sign in.') }}</p>
+                        <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 font-mono text-xs font-bold text-slate-800">
+                            @foreach ($codes as $code)
+                                <div class="rounded-lg border border-orange-200 bg-white px-3 py-2 text-center shadow-xs">{{ $code }}</div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                    <p class="text-xs text-slate-500">
+                        {{ $user->two_factor_enabled ? __('2FA is currently active on your account.') : __('Enable 2FA to protect your account from unauthorized access.') }}
+                    </p>
+
+                    <form method="POST" action="{{ route('profile.two-factor.toggle') }}">
+                        @csrf
+                        <button type="submit" class="rounded-xl px-4 py-2.5 text-xs font-extrabold transition {{ $user->two_factor_enabled ? 'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100' : 'bg-slate-950 text-white hover:bg-slate-800' }}">
+                            {{ $user->two_factor_enabled ? __('Disable 2FA') : __('Enable 2FA via Email') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        @if (auth()->user()->canManageTeam())
+            @php($workspace = \App\Models\WorkspaceSetting::forUser(auth()->user()))
+            <!-- Workspace Branding Section -->
+            <section id="workspace" class="relative mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <span class="absolute inset-y-0 left-0 w-1.5 bg-violet-500"></span>
+                <div class="p-6 sm:p-7">
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.39m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.14 6.34a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+                            </svg>
+                        </span>
+                        <div>
+                            <h2 class="font-extrabold text-slate-950">{{ __('Workspace Branding & Customization') }}</h2>
+                            <p class="mt-1 text-xs text-slate-500">{{ __('Customize your workspace name, brand accent color, and custom logo.') }}</p>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ route('profile.workspace.update') }}" enctype="multipart/form-data" class="mt-6 space-y-4">
+                        @csrf
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="company_name" class="text-xs font-bold text-slate-700">{{ __('Workspace / Company Name') }}</label>
+                                <input id="company_name" name="company_name" type="text"
+                                       value="{{ old('company_name', $workspace?->company_name ?? config('app.name')) }}"
+                                       class="mt-2 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-2.5 text-sm font-semibold focus:border-violet-500 focus:bg-white focus:ring-violet-500">
+                            </div>
+
+                            <div>
+                                <label for="accent_color" class="text-xs font-bold text-slate-700">{{ __('Brand Accent Color') }}</label>
+                                <div class="mt-2 flex items-center gap-2">
+                                    <input type="color" id="accent_color" name="accent_color"
+                                           value="{{ old('accent_color', $workspace?->accent_color ?? '#f97316') }}"
+                                           class="h-10 w-12 rounded-xl border-0 cursor-pointer p-0">
+                                    <span class="text-xs font-mono text-slate-500">{{ $workspace?->accent_color ?? '#f97316' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="logo" class="text-xs font-bold text-slate-700">{{ __('Custom Workspace Logo') }}</label>
+                            <input id="logo" name="logo" type="file" accept="image/*"
+                                   class="mt-2 block w-full text-xs text-slate-500 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-2.5 file:text-xs file:font-bold file:text-slate-700 hover:file:bg-slate-200">
+                            @if ($workspace?->logo_path)
+                                <p class="mt-1.5 text-xs text-slate-500">Current logo saved.</p>
+                            @endif
+                        </div>
+
+                        <button type="submit" class="mt-4 rounded-xl bg-violet-600 px-5 py-2.5 text-xs font-extrabold text-white transition hover:bg-violet-700">
+                            {{ __('Save Workspace Branding') }}
+                        </button>
+                    </form>
+                </div>
+            </section>
+        @endif
     </div>
 </x-app-shell>

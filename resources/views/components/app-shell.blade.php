@@ -64,6 +64,8 @@
             </div>
 
             <div class="flex items-center gap-2 sm:gap-3">
+                <livewire:global-search />
+                <livewire:notification-bell />
                 <x-language-switcher compact/>
 
                 @can('create', \Modules\IssueBoard\Models\Issue::class)

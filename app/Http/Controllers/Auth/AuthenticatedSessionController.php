@@ -39,10 +39,9 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        if (! Auth::attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-        ], (bool) ($credentials['remember'] ?? false))) {
+        $user = User::whereRaw('LOWER(email) = ?', [Str::lower($credentials['email'])])->first();
+
+        if (! $user || ! \Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
             RateLimiter::hit($key, 60);
 
             throw ValidationException::withMessages([
@@ -51,6 +50,17 @@ class AuthenticatedSessionController extends Controller
         }
 
         RateLimiter::clear($key);
+
+        if ($user->two_factor_enabled) {
+            $request->session()->put('two_factor_user_id', $user->id);
+            $request->session()->put('two_factor_remember', (bool) ($credentials['remember'] ?? false));
+
+            TwoFactorChallengeController::sendTwoFactorCode($user);
+
+            return redirect()->route('two-factor.challenge');
+        }
+
+        Auth::login($user, (bool) ($credentials['remember'] ?? false));
         $request->session()->regenerate();
 
         return redirect()->intended(route('issueboard.index'));

@@ -47,8 +47,19 @@
             @endif
         </a>
 
-        <div class="mt-3 flex flex-wrap items-center gap-2">
-            <span class="inline-flex max-w-full items-center gap-1.5 rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
+        @if ($issue->labels && $issue->labels->isNotEmpty())
+            <div class="mt-2.5 flex flex-wrap gap-1">
+                @foreach ($issue->labels as $label)
+                    <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-bold"
+                          style="background-color: {{ $label->color }}22; color: {{ $label->color }}; border: 1px solid {{ $label->color }}44;">
+                        {{ $label->name }}
+                    </span>
+                @endforeach
+            </div>
+        @endif
+
+        <div class="mt-3 flex flex-wrap items-center gap-1.5">
+            <span class="inline-flex max-w-full items-center gap-1 rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
                 <svg class="h-3.5 w-3.5 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15l-.75 18H5.25L4.5 3Zm4.5 4.5h6m-6 4.5h6"/>
                 </svg>
@@ -67,7 +78,33 @@
                     {{ $issue->due_date->format('d.m.') }}
                 </span>
             @endif
+
+            @if ($issue->spent_hours > 0 || $issue->estimated_hours > 0)
+                <span class="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600" title="Time tracked: Spent / Estimated">
+                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    {{ $issue->spent_hours ?: 0 }}h{{ $issue->estimated_hours ? ' / '.$issue->estimated_hours.'h' : '' }}
+                </span>
+            @endif
         </div>
+
+        @if (($issue->checklist_total_count ?? 0) > 0)
+            <div class="mt-3">
+                <div class="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                    <span class="inline-flex items-center gap-1">
+                        <svg class="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        {{ $issue->checklist_completed_count }}/{{ $issue->checklist_total_count }}
+                    </span>
+                    <span>{{ round(($issue->checklist_completed_count / $issue->checklist_total_count) * 100) }}%</span>
+                </div>
+                <div class="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div class="h-full bg-emerald-500 transition-all duration-300" style="width: {{ ($issue->checklist_completed_count / $issue->checklist_total_count) * 100 }}%"></div>
+                </div>
+            </div>
+        @endif
 
         <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
             <div class="flex min-w-0 items-center gap-2">

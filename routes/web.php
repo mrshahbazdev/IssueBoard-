@@ -25,6 +25,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
+    Route::get('/two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'create'])->name('two-factor.challenge');
+    Route::post('/two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'store']);
+    Route::post('/two-factor-challenge/resend', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'resend'])->name('two-factor.resend');
 });
 
 Route::middleware('auth')->group(function () {
@@ -32,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::post('/profile/two-factor', [ProfileController::class, 'toggleTwoFactor'])->name('profile.two-factor.toggle');
+    Route::post('/profile/workspace', [ProfileController::class, 'updateWorkspace'])->name('profile.workspace.update');
     Route::put('/profile/smtp', [ProfileController::class, 'updateSmtp'])->name('profile.smtp');
     Route::match(['post', 'put'], '/profile/smtp/test', [ProfileController::class, 'testSmtp'])
         ->middleware('throttle:5,1')

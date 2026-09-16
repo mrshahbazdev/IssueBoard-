@@ -104,6 +104,75 @@
                 @endif
             </section>
 
+            <!-- Checklist / Subtasks Section -->
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+                @php
+                    $checklists = $issue->checklistItems;
+                    $totalTasks = $checklists->count();
+                    $completedTasks = $checklists->where('is_completed', true)->count();
+                    $percentage = $totalTasks > 0 ? (int) round(($completedTasks / $totalTasks) * 100) : 0;
+                @endphp
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">{{ __('issueboard::issueboard.checklist') ?? 'Checklist / Subtasks' }}</h2>
+                            <p class="mt-0.5 text-xs text-slate-500">{{ $completedTasks }} of {{ $totalTasks }} completed ({{ $percentage }}%)</p>
+                        </div>
+                    </div>
+                    @if ($totalTasks > 0)
+                        <div class="w-full sm:w-40">
+                            <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                                <div class="h-full bg-emerald-500 transition-all duration-300" style="width: {{ $percentage }}%"></div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="mt-5 space-y-2">
+                    @forelse ($checklists as $item)
+                        <div wire:key="task-{{ $item->id }}" class="group flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-3.5 py-2.5 transition hover:border-slate-200 hover:bg-white">
+                            <label class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+                                <input type="checkbox"
+                                       wire:click="toggleChecklistItem({{ $item->id }})"
+                                       @checked($item->is_completed)
+                                       class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                                <span class="text-sm font-semibold truncate {{ $item->is_completed ? 'line-through text-slate-400' : 'text-slate-800' }}">
+                                    {{ $item->title }}
+                                </span>
+                            </label>
+                            @can('update', $issue)
+                                <button type="button" wire:click="deleteChecklistItem({{ $item->id }})"
+                                        class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-600 transition p-1">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            @endcan
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-400 italic">No checklist tasks added yet.</p>
+                    @endforelse
+                </div>
+
+                @can('update', $issue)
+                    <div class="mt-4 flex gap-2">
+                        <input type="text" wire:model="newChecklistTitle"
+                               wire:keydown.enter="addChecklistItem"
+                               placeholder="{{ __('Add a subtask or checklist item...') }}"
+                               class="w-full rounded-xl border-slate-300 bg-slate-50 px-3.5 py-2 text-xs font-semibold placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500">
+                        <button type="button" wire:click="addChecklistItem"
+                                class="shrink-0 rounded-xl bg-slate-900 px-4 py-2 text-xs font-extrabold text-white transition hover:bg-slate-800">
+                            {{ __('Add') }}
+                        </button>
+                    </div>
+                @endcan
+            </section>
+
             @if ($issue->links->isNotEmpty() || $issue->attachments->isNotEmpty())
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
                     <div class="flex items-center gap-3">
@@ -431,6 +500,124 @@
                     @endif
                 </dl>
             </section>
+
+            <!-- Labels / Tags Section -->
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-900">{{ __('issueboard::issueboard.labels') ?? 'Labels / Tags' }}</h2>
+                    <span class="text-xs text-slate-400 font-semibold">{{ $issue->labels->count() }}</span>
+                </div>
+
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                    @forelse ($issue->labels as $label)
+                        <span wire:key="lbl-{{ $label->id }}"
+                              class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-bold"
+                              style="background-color: {{ $label->color }}22; color: {{ $label->color }}; border: 1px solid {{ $label->color }}44;">
+                            {{ $label->name }}
+                            @can('update', $issue)
+                                <button type="button" wire:click="toggleLabel({{ $label->id }})" class="hover:opacity-70">
+                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            @endcan
+                        </span>
+                    @empty
+                        <p class="text-xs text-slate-400 italic">No labels attached.</p>
+                    @endforelse
+                </div>
+
+                @can('update', $issue)
+                    @php
+                        $unattached = $availableLabels->diff($issue->labels);
+                    @endphp
+                    @if ($unattached->isNotEmpty())
+                        <div class="mt-3 pt-3 border-t border-slate-100">
+                            <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-1.5">Add existing label</p>
+                            <div class="flex flex-wrap gap-1">
+                                @foreach ($unattached as $uLabel)
+                                    <button type="button" wire:click="toggleLabel({{ $uLabel->id }})"
+                                            class="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold transition hover:scale-105"
+                                            style="background-color: {{ $uLabel->color }}18; color: {{ $uLabel->color }}; border: 1px dashed {{ $uLabel->color }}66;">
+                                        + {{ $uLabel->name }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="mt-3 pt-3 border-t border-slate-100">
+                        <div class="flex items-center gap-1.5">
+                            <input type="color" wire:model="newLabelColor" class="h-7 w-7 rounded-lg border-0 cursor-pointer p-0">
+                            <input type="text" wire:model="newLabelName" placeholder="New label name..." class="flex-1 rounded-xl border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold focus:border-orange-500 focus:bg-white focus:ring-orange-500">
+                            <button type="button" wire:click="createAndAttachLabel" class="rounded-xl bg-slate-900 px-3 py-1 text-xs font-bold text-white hover:bg-slate-800 transition">Add</button>
+                        </div>
+                    </div>
+                @endcan
+            </section>
+
+            <!-- Time Tracking & Estimates -->
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-900">Time Tracking</h2>
+                    <span class="text-xs font-extrabold text-slate-700">
+                        {{ $issue->spent_hours ?: 0 }}h / {{ $issue->estimated_hours ? $issue->estimated_hours.'h' : '—' }}
+                    </span>
+                </div>
+
+                @if ($issue->estimated_hours > 0)
+                    @php
+                        $timePercent = min(100, (int) round((($issue->spent_hours ?: 0) / $issue->estimated_hours) * 100));
+                        $isOverEstimate = ($issue->spent_hours ?: 0) > $issue->estimated_hours;
+                    @endphp
+                    <div class="mt-3">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-400 mb-1">
+                            <span>Progress</span>
+                            <span class="{{ $isOverEstimate ? 'text-rose-600 font-extrabold' : '' }}">{{ $timePercent }}%</span>
+                        </div>
+                        <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                            <div class="h-full {{ $isOverEstimate ? 'bg-rose-500' : 'bg-orange-500' }} transition-all duration-300" style="width: {{ $timePercent }}%"></div>
+                        </div>
+                    </div>
+                @endif
+
+                @can('update', $issue)
+                    <div class="mt-4 pt-3 border-t border-slate-100 space-y-2.5">
+                        <div class="flex items-center gap-2">
+                            <input type="number" step="0.25" min="0.25" wire:model="timeToLog" placeholder="+ Log hrs (e.g. 1.5)" class="flex-1 rounded-xl border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold focus:border-orange-500 focus:bg-white focus:ring-orange-500">
+                            <button type="button" wire:click="logTime" class="rounded-xl bg-orange-500 px-3 py-1 text-xs font-extrabold text-white hover:bg-orange-600 transition">Log</button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" step="0.5" min="0" wire:model="newEstimate" placeholder="Set estimate hrs" class="flex-1 rounded-xl border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold focus:border-slate-400 focus:bg-white focus:ring-slate-400">
+                            <button type="button" wire:click="updateEstimate" class="rounded-xl bg-slate-100 px-3 py-1 text-xs font-extrabold text-slate-700 hover:bg-slate-200 transition">Set</button>
+                        </div>
+                    </div>
+                @endcan
+            </section>
+
+            <!-- Activity Stream -->
+            @if ($activities->isNotEmpty())
+                <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h2 class="text-sm font-bold text-slate-900">Activity Stream</h2>
+                    <ul class="relative mt-4 space-y-3.5 before:absolute before:bottom-2 before:left-[5px] before:top-2 before:w-px before:bg-slate-200">
+                        @foreach ($activities as $act)
+                            <li class="relative flex gap-3 text-xs">
+                                <span class="relative z-10 mt-1 h-2 w-2 shrink-0 rounded-full bg-orange-500 ring-4 ring-white"></span>
+                                <div class="min-w-0">
+                                    <p class="leading-5 text-slate-600">
+                                        <span class="font-bold text-slate-900">{{ $act->user?->name ?? 'System' }}</span>
+                                        {{ str_replace('_', ' ', $act->action) }}
+                                        @if ($act->to_value)
+                                            <span class="font-semibold text-slate-800">"{{ $act->to_value }}"</span>
+                                        @endif
+                                    </p>
+                                    <time class="text-[10px] text-slate-400">{{ $act->created_at->diffForHumans() }}</time>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
 
             @if ($history->isNotEmpty())
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

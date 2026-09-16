@@ -153,6 +153,8 @@ class Issue extends Model
             'allComments as comments_count',
             'allComments as open_questions_count' => fn ($q) => $q->where('is_question', true)->whereNull('answered_at'),
             'attachments as attachments_count',
+            'checklistItems as checklist_total_count',
+            'checklistItems as checklist_completed_count' => fn ($q) => $q->where('is_completed', true),
         ]);
     }
 

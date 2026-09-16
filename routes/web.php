@@ -12,13 +12,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/invite/{token}', [InvitationAcceptanceController::class, 'create'])
-        ->name('invitations.accept');
-    Route::post('/invite/{token}', [InvitationAcceptanceController::class, 'store'])
-        ->middleware('throttle:10,1')
-        ->name('invitations.store');
-});
+// Team Invitation acceptance (accessible by guests and authenticated users)
+Route::get('/invite/{token}', [InvitationAcceptanceController::class, 'create'])
+    ->name('invitations.accept');
+Route::post('/invite/{token}', [InvitationAcceptanceController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('invitations.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');

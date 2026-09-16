@@ -166,6 +166,7 @@ return [
         'team_joined' => 'You have joined :team\'s team successfully.',
         'existing_account_info' => 'You already have an IssueBoard account for :email. Enter your password to join this workspace team.',
         'logged_in_as' => 'You are currently logged in as :name (:email).',
+        'logged_in_as_other' => 'You are currently signed in as :current, but this invitation is for :invited. Enter the password for :invited to switch and join, or log out first.',
         'click_to_join' => 'Click below to accept this invitation and join :inviter\'s team as :role.',
         'join_team' => 'Join Team',
         'login_and_join' => 'Log In & Join Team',

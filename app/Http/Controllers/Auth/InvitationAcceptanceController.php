@@ -16,15 +16,39 @@ use Illuminate\View\View;
 
 class InvitationAcceptanceController extends Controller
 {
-    public function create(string $token): View|Response
+    public function create(Request $request, string $token): View|Response|RedirectResponse
     {
         $invitation = $this->findInvitation($token);
 
         if (! $invitation) {
+            // If already accepted and the user is logged in as this email, redirect smoothly to board
+            $alreadyAccepted = TeamInvitation::query()
+                ->where('token', hash('sha256', $token))
+                ->whereNotNull('accepted_at')
+                ->first();
+
+            if ($alreadyAccepted && Auth::check() && mb_strtolower(Auth::user()->email) === mb_strtolower($alreadyAccepted->email)) {
+                return redirect()->route('issueboard.index')
+                    ->with('status', __('app.invitation.team_joined', ['team' => $alreadyAccepted->inviter?->name ?? 'workspace']));
+            }
+
             return response()->view('auth.invitation-invalid', status: 410);
         }
 
         $existingUser = User::whereRaw('LOWER(email) = ?', [mb_strtolower($invitation->email)])->first();
+
+        // If the user is already logged in as the invited account, accept and join immediately
+        if (Auth::check() && $existingUser && Auth::id() === $existingUser->id) {
+            $existingUser->update([
+                'invited_by' => $invitation->invited_by,
+                'role' => $invitation->role,
+            ]);
+
+            $invitation->update(['accepted_at' => now()]);
+
+            return redirect()->route('issueboard.index')
+                ->with('status', __('app.invitation.team_joined', ['team' => $invitation->inviter?->name ?? 'workspace']));
+        }
 
         return view('auth.accept-invitation', [
             'invitation' => $invitation,

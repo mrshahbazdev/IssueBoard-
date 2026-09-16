@@ -31,6 +31,12 @@
                     {{ __('app.invitation.join_team') }}
                 </button>
             @else
+                @if (auth()->check() && auth()->id() !== $existingUser->id)
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs font-semibold text-amber-900 leading-5">
+                        {{ __('app.invitation.logged_in_as_other', ['current' => auth()->user()->email, 'invited' => $invitation->email]) }}
+                    </div>
+                @endif
+
                 <div class="rounded-2xl border border-orange-200 bg-orange-50/80 p-4 text-xs font-semibold text-orange-900 leading-5">
                     {{ __('app.invitation.existing_account_info', ['email' => $invitation->email]) }}
                 </div>

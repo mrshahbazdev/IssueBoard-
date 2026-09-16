@@ -166,6 +166,7 @@ return [
         'team_joined' => 'Sie sind dem Team von :team erfolgreich beigetreten.',
         'existing_account_info' => 'Sie haben bereits ein IssueBoard-Konto für :email. Geben Sie Ihr Passwort ein, um diesem Arbeitsbereich-Team beizutreten.',
         'logged_in_as' => 'Sie sind derzeit als :name (:email) angemeldet.',
+        'logged_in_as_other' => 'Sie sind derzeit als :current angemeldet, aber diese Einladung ist für :invited bestimmt. Geben Sie das Passwort für :invited ein, um zu wechseln und beizutreten, oder melden Sie sich zuerst ab.',
         'click_to_join' => 'Klicken Sie unten, um die Einladung anzunehmen und dem Team von :inviter als :role beizutreten.',
         'join_team' => 'Team beitreten',
         'login_and_join' => 'Anmelden & Team beitreten',
